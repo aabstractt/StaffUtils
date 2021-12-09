@@ -1,0 +1,8 @@
+parameters:
+    level: 8
+    paths:
+        - src
+    checkMissingIterableValueType: false
+    checkGenericClassInNonGenericObjectType: false
+    checkExplicitMixed: true
+    checkMissingCallableSignature: true
