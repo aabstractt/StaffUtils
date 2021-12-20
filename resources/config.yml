@@ -1,0 +1,44 @@
+mysql:
+  host: 'justcode.live:3306'
+  username: 'root'
+  password: ''
+  dbname: 'staffutils'
+
+# This format is used on PLAYER_KICK_BANNED and PLAYER_KICK_PERMANENT_BANNED, file messages.yml
+createdAt_format: "d/m/Y H:i:s"
+
+durations:
+  # Can be bypassed with the permission "staffutils.unlimited.ban"
+  tempban_max: "7d"
+  # Can be bypassed with the permission "staffutils.unlimited.mute"
+  tempmute_max: "3d"
+
+  # Time translated
+  seconds: "seconds"
+  minutes: "minutes"
+  hours: "hours"
+  days: "days"
+  years: "years"
+
+# If set, a ban reason must be provided, otherwise players will get an error.
+# When set to false, "DEFAULT_BAN_REASON" in messages.yml are used as reasons when no reason is provided.
+require_ban_reason: false
+
+# If set, a mute reason must be provided, otherwise players will get an error.
+# When set to false, "DEFAULT_MUTE_REASON" in messages.yml are used as reasons when no reason is provided.
+require_mute_reason: false
+
+notify:
+  # If enabled, players with the permission "staffutils.notify.banned_join" will be notified when a banned player tries to join
+  banned_player_join: true
+  # If enabled, /dupeip output will be shown on join if the player meets certain conditions.
+  dupeip_on_join: true
+  # Notify if the player has a banned account on the same IP.
+  dupeip_on_banned_account: true
+  # If enabled, muted accounts will be detected with /dupeip.
+  # This is disabled by default since it can add quite a lot of query overhead on larger servers especially if dupeip_on_join is enabled.
+  dupeip_show_muted_accounts: false
+  # If you set this to a lower value, players with X accounts will send dupeip notifications.
+  dupeip_on_join_threshold: 0
+  # Log all notifications to the console?
+  notify_console: true

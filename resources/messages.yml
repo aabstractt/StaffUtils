@@ -1,0 +1,49 @@
+# {%0} name   {%1} time   {%2} who    {%3} reason
+PLAYER_TEMPORARILY_BANNED: "{%0} was banned from the server for {%1} by {%2}, reason {%3}"
+PLAYER_TEMPORARILY_MUTED: "{%0} was muted from the server for {%1} by {%2}, reason {%3}"
+# {%0} name   {%1} who    {%2} reason
+PLAYER_PERMANENTLY_BANNED: "{%0} was banned from the server by {%1}, reason {%2}"
+PLAYER_PERMANENTLY_MUTED: "{%0} was muted from the server by {%1}, reason {%2}"
+PLAYER_KICKED: "{%0} was kicked from the server by {%1}, reason {%2}"
+# {%0} name   {%1} time
+PLAYER_TRIED_JOIN_BANNED: "&b{%0} tried to join, but is banned ({%1})"
+PLAYER_TRIED_SPEAK_MUTED: "{%0} tried to speak, but is muted ({%1})"
+# {%0} who   {%1} reason   {$2} time   {%3} time remaining
+PLAYER_KICK_BANNED: "You are banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2} ({%3})"
+PLAYER_KICK_PERMANENT_BANNED: "You are permanent banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2}"
+
+PLAYER_TRIED_SPEAK: "You are currently muted by {%0}, reason: {%1}, your mute expires in {%2}"
+
+PLAYER_KICK: "&cYou have been kicked from the server\nKicked by: {%0}\nReason: {%1}"
+PLAYER_UNBANNED: "{%0} was unbanned by {%1}"
+PLAYER_UNMUTED: "{%0} was unmuted by {%1}"
+
+PLAYER_NOT_FOUND: "&c{%0} not found."
+PLAYER_NOT_BANNED: "&c{%0} not banned"
+PLAYER_NOT_MUTED: "&c{%0} not muted"
+PLAYER_ALREADY_BANNED: "&c{%0} already banned"
+PLAYER_ALREADY_MUTED: "&c{%0} already muted"
+DEFAULT_BAN_REASON: "Network ban"
+DEFAULT_MUTE_REASON: "Network mute"
+
+HISTORY_TITLE: "&e--[&6{%0} ago&e]--&r"
+HISTORY_BAN_ENTRY: "{%0} was banned by {%1}"
+HISTORY_MUTE_ENTRY: "{%0} was muted by {%1}"
+HISTORY_UNBAN_ENTRY: "{%0} was unbanned by {%1}"
+HISTORY_UNMUTE_ENTRY: "{%0} was unmuted by {%1}"
+HISTORY_KICK_ENTRY: "{%0} was kicked by {%1}"
+HISTORY_REASON: ": &e'&b{%0}'&r"
+HISTORY_ACTIVE: " [Active]"
+HISTORY_REMAINING: " &7[%0]"
+HISTORY_EXPIRED: " &7[&bExpired&7]"
+HISTORY_ACTIVE_TEMP: " [Active]\nExpires in: {%0}"
+
+SCANNING_PLAYER: "&fScanning to &7{%0}&f, [&aOnline&f] [&7Offline&f] [&cBanned&f]"
+SCANNING_ONLINE: "&a{%0}"
+SCANNING_OFFLINE: "&7{%0}"
+SCANNING_BANNED: "&c{%0}"
+
+SILENT: "&9[S] &r"
+STAFFCHAT_MESSAGE: "&8[Staff] &7{%1} &b{%0}&7: &f{%2}"
+REPORT_SUCCESSFULLY: "&aYour report for {%0} was sent to the staff!"
+NEW_REPORT_RECEIVED: "&9[Report] &b{%1}&a was reported by &b{%0}&a for &b{%3}&a, server &b{%2}"

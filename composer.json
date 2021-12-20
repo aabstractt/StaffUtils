@@ -20,5 +20,8 @@
         "src"
       ]
     }
+  },
+  "scripts": {
+    "make-phar": "@php make-phar.php"
   }
 }
