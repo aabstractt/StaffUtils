@@ -22,6 +22,7 @@
     }
   },
   "scripts": {
-    "make-phar": "@php make-phar.php"
+    "make-phar": "@php make-phar.php",
+    "analyze": "./vendor/bin/phpstan analyze --no-progress --memory-limit=2G"
   }
 }
