@@ -7,6 +7,7 @@ namespace staffutils;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use Predis\Client;
 
 class StaffUtils extends PluginBase {
 
@@ -15,7 +16,21 @@ class StaffUtils extends PluginBase {
     private static array $messages = [];
 
     public function onEnable(): void {
+        $bootstrap = 'phar://' . $this->getServer()->getPluginPath() . 'StaffUtils.phar/vendor/autoload.php';
+        if(!is_file($bootstrap)){
+            echo "[ERROR] Composer autoloader not found at " . $bootstrap . PHP_EOL;
+            echo "[ERROR] Please install/update Composer dependencies or use provided builds." . PHP_EOL;
+
+            exit(1);
+        }
+
+        require_once($bootstrap);
+
+        echo 'Loading' . PHP_EOL;
+
         self::setInstance($this);
+
+        $this->init();
 
         $this->saveDefaultConfig();
         $this->saveResource('messages.yml');
@@ -77,5 +92,13 @@ class StaffUtils extends PluginBase {
         }
 
         return $message;
+    }
+
+    private function init(): void {
+        $thread = new PubSubThread('phar://' . $this->getServer()->getPluginPath() . 'StaffUtils.phar/vendor/autoload.php');
+
+        $thread->start();
+
+        echo 'iniciando thread' . PHP_EOL;
     }
 }

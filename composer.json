@@ -8,21 +8,25 @@
     "ext-yaml": "*",
     "ext-pthreads": "*",
     "ext-json": "*",
-    "ext-mysqli": "*"
+    "ext-mysqli": "*",
+    "riorizkyrainey/pubsub-redis-php": "0.1.0"
   },
+
   "require-dev": {
     "phpstan/phpstan": "0.12.99",
     "pocketmine/pocketmine-mp": "4.0.0-BETA12"
   },
+
   "autoload": {
     "psr-4": {
-      "": [
-        "src"
-      ]
+      "": "src"
     }
   },
   "scripts": {
-    "make-phar": "@php make-phar.php",
-    "analyze": "./vendor/bin/phpstan analyze --no-progress --memory-limit=2G"
+    "make-phar": [
+      "@composer install --no-dev --classmap-authoritative --ignore-platform-reqs",
+      "@php make-phar.php"
+    ],
+    "analyze": "@./vendor/bin/phpstan analyze --no-progress --memory-limit=2G"
   }
 }

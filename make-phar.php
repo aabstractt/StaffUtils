@@ -1,14 +1,8 @@
 <?php
 
-/*
- * Created by PhpStorm.
- *
- * User: zOmArRD
- * Date: 21/11/2021
- *
- * Copyright © 2021 Greek Network - All Rights Reserved.
- */
-$file_phar = 'GreekUHC.phar';
+require dirname(__DIR__) . '/StaffUtils/vendor/autoload.php';
+
+$file_phar = 'StaffUtils.phar';
 
 if (file_exists($file_phar)) {
     echo "Phar file already exists!";
@@ -23,13 +17,19 @@ if (file_exists($file_phar)) {
 $files = [];
 $dir = getcwd() . DIRECTORY_SEPARATOR;
 
-$exclusions = [".idea", ".gitignore", "composer.json", "composer.lock", "make-phar.php", ".git", "vendor"];
+$exclusions = [".idea", ".gitignore", "composer.json", 'composer.phar', "composer.lock", "make-phar.php", ".git", "vendor"];
 
 foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as $path => $file) {
     $bool = true;
     foreach ($exclusions as $exclusion) {
+        if ($exclusion === 'vendor' && (str_contains($path, 'predis') || str_contains($path, 'riorizkyrainey') || str_contains($path, 'autoload.php') || str_contains($path, 'composer') || str_contains($path, 'pocketmine') || str_contains($path, 'phpstan'))) {
+            continue;
+        }
+
         if (str_contains($path, $exclusion)) {
             $bool = false;
+
+            break;
         }
     }
 
@@ -37,9 +37,10 @@ foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dir)) as 
         continue;
     }
 
-    if ($file->isFile() === false) {
+    if (!$file->isFile()) {
         continue;
     }
+
     $files[str_replace($dir, "", $path)] = $path;
 }
 
@@ -49,7 +50,7 @@ $phar = new Phar($file_phar);
 $phar->startBuffering();
 $phar->setSignatureAlgorithm(Phar::SHA1);
 $phar->buildFromIterator(new ArrayIterator($files));
-//$phar->setStub('<?php echo "by zOmArRD"; __HALT_COMPILER();');
+$phar->setStub('<?php echo "thatsmybaby"; __HALT_COMPILER();');
 $phar->compressFiles(Phar::GZ);
 $phar->stopBuffering();
 echo "end." . PHP_EOL;
