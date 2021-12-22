@@ -135,6 +135,6 @@ class BanEntry {
      * @return bool
      */
     public function expired(): bool {
-        return true;
+        return !$this->isPermanent() && StaffUtils::dateNow() > $this->endAt;
     }
 }

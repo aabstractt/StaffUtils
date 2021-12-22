@@ -1,5 +1,5 @@
-# {%0} name   {%1} time   {%2} who    {%3} reason
-PLAYER_TEMPORARILY_BANNED: "{%0} was banned from the server for {%1} by {%2}, reason {%3}"
+# {%0} name   {%1} who    {%2} reason   {%3} time
+PLAYER_TEMPORARILY_BANNED: "{%0} was banned from the server for {%3} by {%1}, reason {%2}"
 PLAYER_TEMPORARILY_MUTED: "{%0} was muted from the server for {%1} by {%2}, reason {%3}"
 # {%0} name   {%1} who    {%2} reason
 PLAYER_PERMANENTLY_BANNED: "{%0} was banned from the server by {%1}, reason {%2}"
@@ -19,8 +19,8 @@ PLAYER_UNBANNED: "{%0} was unbanned by {%1}"
 PLAYER_UNMUTED: "{%0} was unmuted by {%1}"
 
 PLAYER_NOT_FOUND: "&c{%0} not found."
-PLAYER_NOT_BANNED: "&c{%0} not banned"
-PLAYER_NOT_MUTED: "&c{%0} not muted"
+PLAYER_UNBAN_FAIL: "&c{%0} is not banned"
+PLAYER_UNMUTE_FAIL: "&c{%0} not muted"
 PLAYER_ALREADY_BANNED: "&c{%0} already banned"
 PLAYER_ALREADY_MUTED: "&c{%0} already muted"
 DEFAULT_BAN_REASON: "Network ban"

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace staffutils;
 
+use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use staffutils\command\BanCommand;
+use staffutils\command\UnbanCommand;
 use staffutils\listener\PlayerPreLoginListener;
 use staffutils\utils\TaskUtils;
 
@@ -32,7 +34,17 @@ class StaffUtils extends PluginBase {
         $this->registerListener(new PlayerPreLoginListener());
 
         $this->unregisterCommand('ban');
-        $this->getServer()->getCommandMap()->register('pocketmine', new BanCommand('ban', 'Ban command', '', ['ipban']));
+        $this->registerCommand(
+            new BanCommand('ban', 'Ban command', '', ['ipban']),
+            new UnbanCommand('unban')
+        );
+    }
+
+    /**
+     * @param Command ...$commands
+     */
+    private function registerCommand(Command... $commands): void {
+        $this->getServer()->getCommandMap()->registerAll('staffutils', $commands);
     }
 
     /**
@@ -63,29 +75,38 @@ class StaffUtils extends PluginBase {
      * @return int|null
      */
     public static function calculateTime(string $timeArgument): ?int {
-        return is_int($value = strtotime('+ ' . self::timeRemaining($timeArgument))) ? $value : null;
+        if (($timeRemaining = self::timeRemaining($timeArgument)) === null) {
+            return null;
+        }
+
+        return is_int($value = strtotime('+ ' . $timeRemaining)) ? $value : null;
     }
 
     /**
      * @param string $timeString
      *
-     * @return string
+     * @return string|null
      */
-    public static function timeRemaining(string $timeString): string {
-        $characters = str_replace('[0-9]', '', $timeString);
+    public static function timeRemaining(string $timeString): ?string {
+        $characters = preg_replace('/[0-9]+/', '', $timeString);
 
         $match = match ($characters) {
             's' => 'second',
+            'm' => 'minute',
             'h' => 'hour',
             'd' => 'day',
-            default => 'minute'
+            default => null
         };
 
-        $int = (int) str_replace('[a-z]', '', $timeString);
+        $int = (int) preg_replace('/[a-z]+/', '', $timeString);
+
+        if ($match === null || $int < 1) {
+            return null;
+        }
 
         if ($int > 1) $match .= 's';
 
-        return $int . $match;
+        return $int . ' ' . $match;
     }
 
     /**

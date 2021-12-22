@@ -10,7 +10,7 @@ use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
-use staffutils\async\SaveBanAsync;
+use staffutils\async\ProcessBanAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
@@ -97,14 +97,14 @@ class BanCommand extends Command {
         $entry->setEndAt($endAt);
         $entry->setType(BanEntry::BAN_TYPE);
 
-        TaskUtils::runAsync(new SaveBanAsync($entry), function (SaveBanAsync $query) use ($timeString, $sender, $entry): void {
+        TaskUtils::runAsync(new ProcessBanAsync($entry), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
             if (StaffResult::valueOf($query->resultString()) === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 
                 return;
             }
 
-            Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), StaffUtils::timeRemaining($timeString), $sender->getName(), $entry->getReason()));
+            Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString) ?? ''));
         });
     }
 }

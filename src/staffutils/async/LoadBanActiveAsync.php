@@ -14,17 +14,27 @@ class LoadBanActiveAsync extends QueryAsyncTask {
 
     /**
      * @param string $xuid
+     * @param string $lastAddress
      */
     public function __construct(
-        private string $xuid
+        protected string $xuid,
+        protected string $lastAddress
     ) {}
 
     /**
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
-        $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
-        $mysqli->set($this->xuid);
+        if (($entry = $this->fetch($mysqli, $this->xuid)) === null) {
+            $entry = $this->fetch($mysqli, $this->lastAddress, false);
+        }
+
+        $this->setResult($entry);
+    }
+
+    private function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
+        $mysqli->prepareStatement("SELECT * FROM players_registered WHERE " . ($isXuid ? 'xuid' : 'lastAddress') . " = '?'");
+        $mysqli->set($value);
 
         $stmt = $mysqli->executeStatement();
 
@@ -43,8 +53,8 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             throw new RuntimeException('Player ' . $this->xuid . ' not found');
         }
 
-        $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE xuid = '?'");
-        $mysqli->set($this->xuid);
+        $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
+        $mysqli->set($value);
 
         $stmt = $mysqli->executeStatement();
 
@@ -52,11 +62,15 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             throw new RuntimeException($mysqli->error);
         }
 
+        $entry = null;
+
         while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-            $this->setResult(new BanEntry($this->xuid, $name, $row['address'], $row['who'], $row['is_ip'] ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE));
+            $entry = new BanEntry($this->xuid, $name, $row['address'], $row['who'], ($row['isIp'] === 1) ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE);
         }
 
         $result->close();
         $stmt->close();
+
+        return $entry;
     }
 }

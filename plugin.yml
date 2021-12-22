@@ -3,3 +3,25 @@ main: staffutils\StaffUtils
 version: 0.1
 author: "iTheTrollIdk"
 api: 4.0.0
+
+permissions:
+  staffutils.unlimited.ban:
+    default: op
+  staffutils.unlimited.mute:
+    default: op
+  staffutils.command.ban:
+    default: op
+  staffutils.command.ipban:
+    default: op
+  staffutils.command.unban:
+    default: op
+  staffutils.command.mute:
+    default: op
+  staffutils.command.unmute:
+    default: op
+  staffutils.command.kick:
+    default: op
+  staffutils.command.alts:
+    default: op
+  staffutils.command.checkban:
+    default: op

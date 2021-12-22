@@ -7,13 +7,13 @@ namespace staffutils\async;
 use staffutils\BanEntry;
 use staffutils\utils\MySQL;
 
-class SaveBanAsync extends LoadBanActiveAsync {
+class ProcessBanAsync extends LoadBanActiveAsync {
 
     /**
      * @param BanEntry $entry
      */
     public function __construct(private BanEntry $entry) {
-        parent::__construct($entry->getXuid());
+        parent::__construct($entry->getXuid(), $entry->getAddress());
     }
 
     /**
@@ -24,7 +24,7 @@ class SaveBanAsync extends LoadBanActiveAsync {
 
         parent::query($mysqli);
 
-        if (($result = $this->getResult()) instanceof BanEntry && $result->expired()) {
+        if (($result = $this->getResult()) instanceof BanEntry && !$result->expired()) {
             $this->setResult('ALREADY_BANNED');
 
             return;
