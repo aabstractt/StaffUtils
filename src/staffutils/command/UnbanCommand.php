@@ -52,7 +52,7 @@ class UnbanCommand extends Command {
 
     private function processUnban(CommandSender $sender, string $xuid, string $lastAddress, string $name): void {
         TaskUtils::runAsync(new ProcessUnbanAsync($xuid, $lastAddress), function (ProcessUnbanAsync $query) use ($sender, $name): void {
-            if (StaffResult::valueOf($query->resultString()) === StaffResult::UNBAN_FAIL()) {
+            if ($query->resultString() === StaffResult::UNBAN_FAIL()->name()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_UNBAN_FAIL', $name));
 
                 return;
