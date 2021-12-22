@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace staffutils\async;
 
 use staffutils\BanEntry;
-use staffutils\task\QueryAsyncTask;
+use staffutils\utils\BanResult;
 use staffutils\utils\MySQL;
 
 class SaveBanAsync extends LoadBanActiveAsync {
 
-    public int $status = 0;
+    public BanResult $banResult;
 
     /**
      * @param BanEntry $entry
@@ -30,8 +30,9 @@ class SaveBanAsync extends LoadBanActiveAsync {
 
         parent::query($mysqli);
 
-        if (is_array($row = $this->getResult()) || !empty($row)) {
-            $this->status = 1;
+        /** @var $result BanEntry */
+        if (($result = $this->getResult()) instanceof BanEntry && $result->expired()) {
+            $this->banResult = BanResult::ALREADY_BANNED();
 
             return;
         }
@@ -41,5 +42,7 @@ class SaveBanAsync extends LoadBanActiveAsync {
         $mysqli->set($entry->getXuid(), $entry->getWho(), $entry->getAddress(), $entry->isIp(), $entry->getReason(), $entry->getCreatedAt(), $entry->getEndAt());
 
         $mysqli->executeStatement()->close();
+
+        $this->banResult = BanResult::SUCCESS();
     }
 }

@@ -43,9 +43,9 @@ class TaskUtils {
 
         self::$dbname = $data['dbname'];
 
-        self::$port = ((int) $hostSplit[1]) ?? 3306;
+        self::$port = (int)($hostSplit[1] ?? 3306);
 
-        if (is_bool(($contents = file_get_contents(StaffUtils::getInstance()->getDataFolder() . 'mysql.sql')))) {
+        /*if (is_bool(($contents = file_get_contents(StaffUtils::getInstance()->getDataFolder() . 'mysql.sql')))) {
             throw new PluginException('Failed to load contents');
         }
 
@@ -61,7 +61,7 @@ class TaskUtils {
             $contents0 .= $content . "\n";
         }
 
-        //TaskHandlerStorage::execute(ExecuteQueriesAsync::class, [$contents0]);
+        //TaskHandlerStorage::execute(ExecuteQueriesAsync::class, [$contents0]);*/
     }
 
     /**

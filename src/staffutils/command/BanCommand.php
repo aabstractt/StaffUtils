@@ -8,11 +8,12 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 use pocketmine\Server;
-use staffutils\async\LoadBanActiveAsync;
+use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\SaveBanAsync;
 use staffutils\BanEntry;
 use staffutils\StaffUtils;
+use staffutils\utils\BanResult;
 use staffutils\utils\TaskUtils;
 
 class BanCommand extends Command {
@@ -24,7 +25,7 @@ class BanCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (($name = array_shift($args)) === null) {
-            $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', '<player>', $args[0]));
+            $sender->sendMessage(TextFormat::RED . 'Use /ban <player> <time> <reason>');
 
             return;
         }
@@ -55,6 +56,11 @@ class BanCommand extends Command {
         $this->insertBan($sender, $args, new BanEntry($target->getXuid(), $target->getName(), $target->getNetworkSession()->getIp(), $xuid, $commandLabel === 'ipban'));
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param array         $args
+     * @param BanEntry      $entry
+     */
     private function insertBan(CommandSender $sender, array $args, BanEntry $entry): void {
         $time = null;
 
@@ -63,11 +69,14 @@ class BanCommand extends Command {
             unset($args[0]);
         }
 
-        if (!is_string($maxString = StaffUtils::getInstance()->getConfig()->get('tempban_max', '7d'))) {
+        if (!is_string($maxString = StaffUtils::getInstance()->getConfig()->getNested('durations.tempban_max', '7d'))) {
+            echo 'just return' . PHP_EOL;
             return;
         }
 
         if (($maxTime = StaffUtils::calculateTime($maxString)) === null) {
+            echo 'time not found' . PHP_EOL;
+
             return;
         }
 
@@ -87,20 +96,18 @@ class BanCommand extends Command {
             $entry->setReason(implode(' ', $args));
         }
 
-        TaskUtils::runAsync(new LoadBanActiveAsync($entry->getXuid()), function (LoadBanActiveAsync $query) use ($timeString, $endAt, $entry, $sender): void {
-            if (($result = $query->getResult()) instanceof BanEntry && !$result->expired()) {
-                $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $result->getName()));
+        $entry->setCreatedAt();
+        $entry->setEndAt($endAt);
+        $entry->setType(BanEntry::BAN_TYPE);
+
+        TaskUtils::runAsync(new SaveBanAsync($entry), function (SaveBanAsync $query) use ($timeString, $sender, $entry): void {
+            if ($query->banResult === BanResult::ALREADY_BANNED()) {
+                $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 
                 return;
             }
 
-            $entry->setCreatedAt();
-            $entry->setEndAt($endAt);
-            $entry->setType(BanEntry::BAN_TYPE);
-
             Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString)));
-
-            TaskUtils::runAsync(new SaveBanAsync($entry));
         });
     }
 }

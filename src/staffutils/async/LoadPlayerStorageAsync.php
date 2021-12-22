@@ -21,7 +21,7 @@ class LoadPlayerStorageAsync extends QueryAsyncTask {
     ) {}
 
     public function query(MySQL $mysqli): void {
-        $mysqli->prepareStatement('SELECT * FROM players_registered WHERE ' . ($this->isXuid ? 'xuid' : 'username') . ' = ?');
+        $mysqli->prepareStatement('SELECT * FROM players_registered WHERE ' . ($this->isXuid ? 'xuid' : 'username') . " = '?'");
         $mysqli->set($this->xuid);
 
         $stmt = $mysqli->executeStatement();

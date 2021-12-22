@@ -7,6 +7,9 @@ namespace staffutils;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
+use pocketmine\utils\TextFormat;
+use staffutils\command\BanCommand;
+use staffutils\utils\TaskUtils;
 
 class StaffUtils extends PluginBase {
 
@@ -21,6 +24,24 @@ class StaffUtils extends PluginBase {
         $this->saveResource('messages.yml');
 
         self::$messages = (new Config($this->getDataFolder() . 'messages.yml'))->getAll();
+
+        TaskUtils::init();
+
+        $this->unregisterCommand('ban');
+        $this->getServer()->getCommandMap()->register('pocketmine', new BanCommand('ban', 'Ban command', '', ['ipban']));
+    }
+
+    /**
+     * @param string ...$commands
+     */
+    private function unregisterCommand(string... $commands): void {
+        foreach ($commands as $command) {
+            if (($cmd = $this->getServer()->getCommandMap()->getCommand($command)) === null) {
+                continue;
+            }
+
+            $this->getServer()->getCommandMap()->unregister($cmd);
+        }
     }
 
     /**
@@ -73,9 +94,9 @@ class StaffUtils extends PluginBase {
         $message = self::$messages[$text] ?? $text;
 
         foreach ($args as $i => $arg) {
-            $message = str_replace('{%' . $i . '}', $args, $message);
+            $message = str_replace('{%' . $i . '}', $arg, $message);
         }
 
-        return $message;
+        return TextFormat::colorize($message);
     }
 }

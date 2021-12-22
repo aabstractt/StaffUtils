@@ -28,7 +28,7 @@ class SavePlayerStorageAsync extends QueryAsyncTask {
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
-        $mysqli->prepareStatement('SELECT * FROM players_registered WHERE xuid = ?');
+        $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
 
         $mysqli->set($this->xuid);
 
@@ -39,7 +39,7 @@ class SavePlayerStorageAsync extends QueryAsyncTask {
         }
 
         if (is_array($result->fetch_array(MYSQLI_ASSOC))) {
-            $mysqli->prepareStatement('UPDATE players_registered SET username = ?, lastAddress = ? WHERE xuid = ?');
+            $mysqli->prepareStatement("UPDATE players_registered SET username = '?', lastAddress = '?' WHERE xuid = '?'");
 
             $mysqli->set($this->name, $this->lastAddress, $this->xuid);
         } else {
@@ -48,6 +48,7 @@ class SavePlayerStorageAsync extends QueryAsyncTask {
             $mysqli->set($this->name, $this->xuid, $this->firstAddress, $this->lastAddress ?? $this->firstAddress);
         }
 
+        $result->close();
         $stmt->close();
 
         $mysqli->executeStatement()->close();

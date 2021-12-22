@@ -8,7 +8,7 @@
  *
  * Copyright © 2021 Greek Network - All Rights Reserved.
  */
-$file_phar = 'GreekUHC.phar';
+$file_phar = 'StaffUtils.phar';
 
 if (file_exists($file_phar)) {
     echo "Phar file already exists!";
