@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace staffutils\task;
 
 use Exception;
+use LogicException;
 use ReflectionClass;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -52,83 +53,13 @@ abstract class QueryAsyncTask extends AsyncTask {
     }
 
     /**
-     * @param string $table
-     * @param array  $data
-     *
      * @return string
      */
-    protected static function arrayToQueryInsert(string $table, array $data): string {
-        $query = 'INSERT INTO ' . $table . ' (';
-
-        $i = 0;
-
-        foreach (array_keys($data) as $key) {
-            if ($i !== (count($data) - 1)) {
-                $query .= "$key, ";
-            } else {
-                $query .= $key;
-            }
-
-            $i++;
+    public function resultString(): string {
+        if (!is_string($result = $this->getResult())) {
+            throw new LogicException('Result not is string');
         }
 
-        $query .= ') VALUES (';
-
-        $i = 0;
-
-        foreach ($data as $value) {
-            if (is_array($value)) {
-                $value = implode(';', $value);
-            } else if (is_bool($value)) {
-                $value = $value ? 1 : 0;
-            }
-
-            if ($i !== (count($data) - 1)) {
-                $query .= "'$value', ";
-            } else {
-                $query .= "'$value'";
-            }
-
-            $i++;
-        }
-
-        $query .= ')';
-
-        return $query;
-    }
-
-    /**
-     * @param string $table
-     * @param array  $data
-     * @param string $option
-     *
-     * @return string
-     */
-    protected static function arrayToQueryUpdate(string $table, array $data, string $option): string {
-        $query = 'UPDATE ' . $table . ' ';
-
-        $i = 0;
-
-        foreach ($data as $key => $value) {
-            if (is_array($value)) {
-                $value = implode(';', $value);
-            } else if (is_bool($value)) {
-                $value = $value ? 1 : 0;
-            }
-
-            if (count($data) === 1) {
-                $query .= "SET $key = '$value' ";
-            } else if ($i === 0) {
-                $query .= "SET $key = '$value', ";
-            } else if ($i !== (count($data) - 1)) {
-                $query .= "$key = '$value', ";
-            } else {
-                $query .= "$key = '$value'";
-            }
-
-            $i++;
-        }
-
-        return $query . ' ' . $option;
+        return $result;
     }
 }

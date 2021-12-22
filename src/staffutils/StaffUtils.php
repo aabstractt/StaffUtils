@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace staffutils;
 
+use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use staffutils\command\BanCommand;
+use staffutils\listener\PlayerPreLoginListener;
 use staffutils\utils\TaskUtils;
 
 class StaffUtils extends PluginBase {
@@ -27,8 +29,19 @@ class StaffUtils extends PluginBase {
 
         TaskUtils::init();
 
+        $this->registerListener(new PlayerPreLoginListener());
+
         $this->unregisterCommand('ban');
         $this->getServer()->getCommandMap()->register('pocketmine', new BanCommand('ban', 'Ban command', '', ['ipban']));
+    }
+
+    /**
+     * @param Listener ...$listeners
+     */
+    private function registerListener(Listener... $listeners): void {
+        foreach ($listeners as $listener) {
+            $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        }
     }
 
     /**

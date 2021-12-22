@@ -43,7 +43,7 @@ class SavePlayerStorageAsync extends QueryAsyncTask {
 
             $mysqli->set($this->name, $this->lastAddress, $this->xuid);
         } else {
-            $mysqli->prepareStatement('INSERT INTO players_registered (username, xuid, firstAddress, lastAddress) VALUES (?, ?, ?, ?)');
+            $mysqli->prepareStatement("INSERT INTO players_registered (username, xuid, firstAddress, lastAddress) VALUES ('?', '?', '?', '?')");
 
             $mysqli->set($this->name, $this->xuid, $this->firstAddress, $this->lastAddress ?? $this->firstAddress);
         }

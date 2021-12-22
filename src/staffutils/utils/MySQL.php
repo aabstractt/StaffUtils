@@ -32,6 +32,8 @@ class MySQL extends mysqli {
             $query = $this->statement();
         }
 
+        $this->replace = [];
+
         $stmt = $this->prepare(str_replace('empty', 'null', $query));
 
         if (!$stmt instanceof mysqli_stmt || !$stmt->execute()) {

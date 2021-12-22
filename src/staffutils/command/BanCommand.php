@@ -12,8 +12,8 @@ use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\SaveBanAsync;
 use staffutils\BanEntry;
+use staffutils\StaffResult;
 use staffutils\StaffUtils;
-use staffutils\utils\BanResult;
 use staffutils\utils\TaskUtils;
 
 class BanCommand extends Command {
@@ -47,7 +47,7 @@ class BanCommand extends Command {
                     return;
                 }
 
-                $this->insertBan($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['address'], $xuid, $commandLabel === 'ipban'));
+                $this->insertBan($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['lastAddress'], $xuid, $commandLabel === 'ipban'));
             });
 
             return;
@@ -70,13 +70,10 @@ class BanCommand extends Command {
         }
 
         if (!is_string($maxString = StaffUtils::getInstance()->getConfig()->getNested('durations.tempban_max', '7d'))) {
-            echo 'just return' . PHP_EOL;
             return;
         }
 
         if (($maxTime = StaffUtils::calculateTime($maxString)) === null) {
-            echo 'time not found' . PHP_EOL;
-
             return;
         }
 
@@ -101,13 +98,13 @@ class BanCommand extends Command {
         $entry->setType(BanEntry::BAN_TYPE);
 
         TaskUtils::runAsync(new SaveBanAsync($entry), function (SaveBanAsync $query) use ($timeString, $sender, $entry): void {
-            if ($query->banResult === BanResult::ALREADY_BANNED()) {
+            if (StaffResult::valueOf($query->resultString()) === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 
                 return;
             }
 
-            Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString)));
+            Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), StaffUtils::timeRemaining($timeString), $sender->getName(), $entry->getReason()));
         });
     }
 }
