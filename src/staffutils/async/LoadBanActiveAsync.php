@@ -25,8 +25,8 @@ class LoadBanActiveAsync extends QueryAsyncTask {
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
-        if (($entry = $this->fetch($mysqli, $this->xuid)) === null) {
-            $entry = $this->fetch($mysqli, $this->lastAddress, false);
+        if (($entry = $this->fetch($mysqli, $this->lastAddress, false)) === null) {
+            $entry = $this->fetch($mysqli, $this->xuid);
         }
 
         $this->setResult($entry);

@@ -18,6 +18,7 @@ use staffutils\utils\TaskUtils;
 class StaffUtils extends PluginBase {
 
     use SingletonTrait;
+
     /** @var array */
     private static array $messages = [];
 
@@ -34,23 +35,20 @@ class StaffUtils extends PluginBase {
         $this->registerListener(new PlayerPreLoginListener());
 
         $this->unregisterCommand('ban');
-        $this->registerCommand(
-            new BanCommand('ban', 'Ban command', '', ['ipban']),
-            new UnbanCommand('unban')
-        );
+        $this->registerCommand(new BanCommand('ban', 'Ban command', '', ['ipban']), new UnbanCommand('unban'));
     }
 
     /**
      * @param Command ...$commands
      */
-    private function registerCommand(Command... $commands): void {
+    private function registerCommand(Command...$commands): void {
         $this->getServer()->getCommandMap()->registerAll('staffutils', $commands);
     }
 
     /**
      * @param Listener ...$listeners
      */
-    private function registerListener(Listener... $listeners): void {
+    private function registerListener(Listener...$listeners): void {
         foreach ($listeners as $listener) {
             $this->getServer()->getPluginManager()->registerEvents($listener, $this);
         }
@@ -59,7 +57,7 @@ class StaffUtils extends PluginBase {
     /**
      * @param string ...$commands
      */
-    private function unregisterCommand(string... $commands): void {
+    private function unregisterCommand(string...$commands): void {
         foreach ($commands as $command) {
             if (($cmd = $this->getServer()->getCommandMap()->getCommand($command)) === null) {
                 continue;
@@ -124,7 +122,7 @@ class StaffUtils extends PluginBase {
      *
      * @return string
      */
-    public static function replacePlaceholders(string $text, string... $args): string {
+    public static function replacePlaceholders(string $text, string...$args): string {
         $message = self::$messages[$text] ?? $text;
 
         foreach ($args as $i => $arg) {
@@ -132,5 +130,24 @@ class StaffUtils extends PluginBase {
         }
 
         return TextFormat::colorize($message);
+    }
+
+    /**
+     * @param string $text
+     * @param bool   $value
+     * @param string ...$args
+     *
+     * @return string
+     */
+    public static function replaceDisplay(string $text, bool $value, string... $args): string {
+        $text = self::replacePlaceholders($text, ...$args);
+
+        if (!str_contains($text, '<display=')) {
+            return $text;
+        }
+
+        $split = explode('<display=', $text);
+
+        return str_replace('<display=' . $split[1], $value ? $split[1] : '', $text);
     }
 }

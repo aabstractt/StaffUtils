@@ -98,7 +98,7 @@ class BanCommand extends Command {
         $entry->setType(BanEntry::BAN_TYPE);
 
         TaskUtils::runAsync(new ProcessBanAsync($entry), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
-            if ($query->resultString() === StaffResult::ALREADY_BANNED()->name()) {
+            if (StaffResult::valueOf($query->resultString()) === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 
                 return;

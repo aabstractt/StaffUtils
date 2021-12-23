@@ -6,28 +6,36 @@ namespace staffutils\async;
 
 use mysqli_result;
 use RuntimeException;
-use staffutils\task\QueryAsyncTask;
+use staffutils\BanEntry;
 use staffutils\utils\MySQL;
+use staffutils\utils\TaskUtils;
 
-class SavePlayerStorageAsync extends QueryAsyncTask {
+class SavePlayerStorageAsync extends LoadBanActiveAsync {
 
     /**
-     * @param string      $name
-     * @param string      $xuid
-     * @param string      $firstAddress
-     * @param string|null $lastAddress
+     * @param string $name
+     * @param string $xuid
+     * @param string $lastAddress
      */
     public function __construct(
         private string $name,
-        private string $xuid,
-        private string $firstAddress,
-        private ?string $lastAddress = null
-    ) {}
+        string $xuid,
+        string $lastAddress
+    ) {
+        parent::__construct($xuid, $lastAddress);
+    }
 
     /**
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
+        parent::query($mysqli);
+
+        /** @var $result BanEntry */
+        if (($result = $this->entryResult()) !== null && !$result->expired()) {
+            return;
+        }
+
         $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
 
         $mysqli->set($this->xuid);
@@ -45,12 +53,22 @@ class SavePlayerStorageAsync extends QueryAsyncTask {
         } else {
             $mysqli->prepareStatement("INSERT INTO players_registered (username, xuid, firstAddress, lastAddress) VALUES ('?', '?', '?', '?')");
 
-            $mysqli->set($this->name, $this->xuid, $this->firstAddress, $this->lastAddress ?? $this->firstAddress);
+            $mysqli->set($this->name, $this->xuid, $this->lastAddress, $this->lastAddress);
         }
 
         $result->close();
         $stmt->close();
 
         $mysqli->executeStatement()->close();
+    }
+
+    public function onCompletion(): void {
+        if (($result = $this->entryResult()) !== null && $result->expired()) {
+            TaskUtils::runAsync(new ProcessUnbanAsync($result->getXuid(), $result->getAddress()));
+
+            $this->setResult(null);
+        }
+
+        parent::onCompletion();
     }
 }

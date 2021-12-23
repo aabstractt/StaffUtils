@@ -9,6 +9,7 @@ use LogicException;
 use ReflectionClass;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
+use staffutils\BanEntry;
 use staffutils\utils\MySQL;
 use staffutils\utils\TaskUtils;
 
@@ -56,10 +57,13 @@ abstract class QueryAsyncTask extends AsyncTask {
      * @return string
      */
     public function resultString(): string {
-        if (!is_string($result = $this->getResult())) {
-            throw new LogicException('Result not is string');
-        }
+        return is_string($result = $this->getResult()) ? $result : throw new LogicException('Result not is string');
+    }
 
-        return $result;
+    /**
+     * @return BanEntry|null
+     */
+    public function entryResult(): ?BanEntry {
+        return ($result = $this->getResult()) instanceof BanEntry ? $result : null;
     }
 }

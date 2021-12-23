@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace staffutils\async;
 
-use RuntimeException;
 use staffutils\BanEntry;
 use staffutils\utils\MySQL;
 
