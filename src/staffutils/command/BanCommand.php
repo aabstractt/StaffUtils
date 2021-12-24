@@ -47,13 +47,13 @@ class BanCommand extends Command {
                     return;
                 }
 
-                $this->insertBan($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['lastAddress'], $xuid, $commandLabel === 'ipban'));
+                $this->insertBan($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['lastAddress'], $xuid, $sender->getName(), $commandLabel === 'ipban'));
             });
 
             return;
         }
 
-        $this->insertBan($sender, $args, new BanEntry($target->getXuid(), $target->getName(), $target->getNetworkSession()->getIp(), $xuid, $commandLabel === 'ipban'));
+        $this->insertBan($sender, $args, new BanEntry($target->getXuid(), $target->getName(), $target->getNetworkSession()->getIp(), $xuid, $sender->getName(), $commandLabel === 'ipban'));
     }
 
     /**
@@ -89,22 +89,51 @@ class BanCommand extends Command {
             $endAt = StaffUtils::dateNow($time);
         }
 
-        if (count($args) > 0) {
-            $entry->setReason(implode(' ', $args));
+        if (empty($args) && StaffUtils::getInstance()->getConfig()->get('require_ban_reason', true)) {
+            $sender->sendMessage(StaffUtils::replacePlaceholders('INVALID_REASON'));
+
+            return;
         }
+
+        $entry->setReason(empty($args) ? StaffUtils::replacePlaceholders('DEFAULT_BAN_REASON') : implode(' ', $args));
 
         $entry->setCreatedAt();
         $entry->setEndAt($endAt);
         $entry->setType(BanEntry::BAN_TYPE);
 
         TaskUtils::runAsync(new ProcessBanAsync($entry), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
-            if (StaffResult::valueOf($query->resultString()) === StaffResult::ALREADY_BANNED()) {
+            if ($query->asStaffResult() === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 
                 return;
             }
 
+            $this->kickBan($entry);
+
             Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString) ?? ''));
         });
+    }
+
+    /**
+     * @param BanEntry $entry
+     */
+    private function kickBan(BanEntry $entry): void {
+        $message = StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getWhoName(), $entry->getReason(), $entry->getCreatedAt(), $entry->remainingDurationString());
+
+        if ($entry->isIp()) {
+            $filter = array_filter(Server::getInstance()->getOnlinePlayers(), function ($player) use ($entry) {
+                return $player->getNetworkSession()->getIp() === $entry->getAddress();
+            });
+
+            foreach ($filter as $target) {
+                $target->kick($message);
+            }
+
+            return;
+        }
+
+        if (($target = Server::getInstance()->getPlayerExact($entry->getName())) !== null) {
+            $target->kick($message);
+        }
     }
 }

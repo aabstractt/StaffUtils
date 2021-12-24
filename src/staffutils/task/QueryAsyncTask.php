@@ -10,6 +10,7 @@ use ReflectionClass;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use staffutils\BanEntry;
+use staffutils\StaffResult;
 use staffutils\utils\MySQL;
 use staffutils\utils\TaskUtils;
 
@@ -65,5 +66,12 @@ abstract class QueryAsyncTask extends AsyncTask {
      */
     public function entryResult(): ?BanEntry {
         return ($result = $this->getResult()) instanceof BanEntry ? $result : null;
+    }
+
+    /**
+     * @return StaffResult
+     */
+    public function asStaffResult(): StaffResult {
+        return StaffResult::valueOf($this->resultString());
     }
 }

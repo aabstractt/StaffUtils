@@ -33,26 +33,6 @@ class LoadBanActiveAsync extends QueryAsyncTask {
     }
 
     private function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
-        $mysqli->prepareStatement("SELECT * FROM players_registered WHERE " . ($isXuid ? 'xuid' : 'lastAddress') . " = '?'");
-        $mysqli->set($value);
-
-        $stmt = $mysqli->executeStatement();
-
-        if (!($result = $stmt->get_result()) instanceof mysqli_result) {
-            throw new RuntimeException($mysqli->error);
-        }
-
-        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-            $name = (string) $row['username'];
-        }
-
-        $result->close();
-        $stmt->close();
-
-        if (!isset($name)) {
-            throw new RuntimeException('Player ' . $this->xuid . ' not found');
-        }
-
         $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
         $mysqli->set($value);
 
@@ -62,15 +42,55 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             throw new RuntimeException($mysqli->error);
         }
 
-        $entry = null;
-
-        while ($row = $result->fetch_array(MYSQLI_ASSOC)) {
-            $entry = new BanEntry($this->xuid, $name, $row['address'], $row['who'], ($row['isIp'] === 1) ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE);
-        }
+        $row = $result->fetch_array(MYSQLI_ASSOC);
 
         $result->close();
         $stmt->close();
 
-        return $entry;
+        if (empty($row)) {
+            return null;
+        }
+
+        $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
+        $mysqli->set($row['xuid']);
+
+        $stmt = $mysqli->executeStatement();
+
+        if (!($result = $stmt->get_result()) instanceof mysqli_result) {
+            throw new RuntimeException($mysqli->error);
+        }
+
+        $fetch = $result->fetch_array(MYSQLI_ASSOC);
+
+        $result->close();
+        $stmt->close();
+
+        if (empty($fetch)) {
+            return null;
+        }
+
+        if (($who = $fetch['who']) !== 'CONSOLE') {
+            $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
+            $mysqli->set($who);
+
+            $stmt = $mysqli->executeStatement();
+
+            if (!($result = $stmt->get_result()) instanceof mysqli_result) {
+                throw new RuntimeException($mysqli->error);
+            }
+
+            $whoFetch = $result->fetch_array(MYSQLI_ASSOC);
+
+            $result->close();
+            $stmt->close();
+
+            if (empty($whoFetch)) {
+                return null;
+            }
+
+            $who = $whoFetch['username'];
+        }
+
+        return new BanEntry($this->xuid, $fetch['username'], $row['address'], $row['who'], $who, ($row['isIp'] === 1) ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE);
     }
 }

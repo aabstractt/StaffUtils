@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace staffutils\utils;
 
-use pocketmine\plugin\PluginException;
+use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use staffutils\StaffUtils;
 use staffutils\task\QueryAsyncTask;
@@ -96,5 +96,13 @@ class TaskUtils {
         }
 
         $callable($query);
+    }
+
+    /**
+     * @param Task $task
+     * @param int  $delay
+     */
+    public static function runLater(Task $task, int $delay = 20): void {
+        StaffUtils::getInstance()->getScheduler()->scheduleDelayedTask($task, $delay);
     }
 }

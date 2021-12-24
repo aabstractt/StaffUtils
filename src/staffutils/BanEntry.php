@@ -19,12 +19,14 @@ class BanEntry {
      * @param string $createdAt
      * @param string $endAt
      * @param int    $type
+     * @param string $whoName
      */
     public function __construct(
         private string $xuid,
         private string $name,
         private string $address,
         private string $who,
+        private string $whoName,
         private bool $ip,
         private string $reason = '',
         private string $createdAt = '',
@@ -63,6 +65,13 @@ class BanEntry {
     /**
      * @return string
      */
+    public function getWhoName(): string {
+        return $this->whoName;
+    }
+
+    /**
+     * @return string
+     */
     public function getReason(): string {
         return $this->reason;
     }
@@ -81,6 +90,9 @@ class BanEntry {
         return $this->createdAt;
     }
 
+    /**
+     * @param string|null $createdAt
+     */
     public function setCreatedAt(string $createdAt = null): void {
         if ($createdAt == null) {
             $createdAt = StaffUtils::dateNow();
@@ -136,5 +148,17 @@ class BanEntry {
      */
     public function expired(): bool {
         return !$this->isPermanent() && StaffUtils::dateNow() > $this->endAt;
+    }
+
+    public function remainingDurationString(): string {
+        if ($this->expired() || $this->isPermanent()) {
+            return 'Unknown';
+        }
+
+        if (!is_int($endAt = strtotime($this->endAt))) {
+            return 'Unknown';
+        }
+
+        return StaffUtils::calculateRemain($endAt, time());
     }
 }

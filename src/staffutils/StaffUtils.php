@@ -12,12 +12,16 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use staffutils\command\BanCommand;
 use staffutils\command\UnbanCommand;
+use staffutils\listener\PlayerJoinListener;
 use staffutils\listener\PlayerPreLoginListener;
+use staffutils\listener\PlayerQuitListener;
 use staffutils\utils\TaskUtils;
 
 class StaffUtils extends PluginBase {
 
     use SingletonTrait;
+    /** @var BanEntry[] */
+    public static array $results = [];
 
     /** @var array */
     private static array $messages = [];
@@ -32,7 +36,11 @@ class StaffUtils extends PluginBase {
 
         TaskUtils::init();
 
-        $this->registerListener(new PlayerPreLoginListener());
+        $this->registerListener(
+            new PlayerPreLoginListener(),
+            new PlayerJoinListener(),
+            new PlayerQuitListener()
+        );
 
         $this->unregisterCommand('ban');
         $this->registerCommand(new BanCommand('ban', 'Ban command', '', ['ipban']), new UnbanCommand('unban'));
@@ -65,6 +73,32 @@ class StaffUtils extends PluginBase {
 
             $this->getServer()->getCommandMap()->unregister($cmd);
         }
+    }
+
+    /**
+     * @param int $endAt
+     * @param int $actualAt
+     *
+     * @return string
+     */
+    public static function calculateRemain(int $endAt, int $actualAt): string {
+        $diff = $endAt - $actualAt;
+
+        if ($diff >= 60*60*24) {
+            return ($diff / 86400) . ' days, ' . ($diff % 86400) / 3600 . ' hours, ' . (($diff % 86400) % 3600) / 60 . ' minutes';
+        }
+
+        if ($diff >= 3600) {
+            $hours = $diff / 3600;
+
+            return ($diff / 3600) . ' hours, ' . (($diff - ($hours * 3600)) / 60) . ' minutes';
+        }
+
+        if ($diff >= 60) {
+            return $diff / 60 . ' minutes';
+        }
+
+        return $diff . ' seconds';
     }
 
     /**
