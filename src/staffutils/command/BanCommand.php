@@ -11,6 +11,7 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\ProcessBanAsync;
+use staffutils\async\ProcessUnbanExpiredAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
@@ -101,7 +102,7 @@ class BanCommand extends Command {
         $entry->setEndAt($endAt);
         $entry->setType(BanEntry::BAN_TYPE);
 
-        TaskUtils::runAsync(new ProcessBanAsync($entry), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
+        TaskUtils::runAsync(new ProcessBanAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_banned', true))), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
             if ($query->asStaffResult() === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 

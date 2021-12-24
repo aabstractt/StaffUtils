@@ -6,6 +6,7 @@ namespace staffutils\task;
 
 use Exception;
 use LogicException;
+use pocketmine\plugin\PluginException;
 use ReflectionClass;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -28,6 +29,8 @@ abstract class QueryAsyncTask extends AsyncTask {
     public int $port;
     /** @var Exception|null */
     private ?Exception $logException = null;
+
+    private int $index = 0;
 
     /**
      * @param MySQL $mysqli
@@ -55,17 +58,42 @@ abstract class QueryAsyncTask extends AsyncTask {
     }
 
     /**
+     * @param mixed ...$newResult
+     */
+    protected function addResult(mixed... $newResult): void {
+        if (is_array($result = $this->getResult())) {
+            $this->setResult(array_merge($result, [$newResult]));
+        }
+    }
+
+    public function asInt(): int {
+        if (is_array($result = $this->getResult())) {
+            return (int)array_values($result)[$this->index++] ?? throw new PluginException('Result not found');
+        }
+
+        return is_int($value = $this->getResult()) ? $value : throw new LogicException('Result not is integer');
+    }
+
+    /**
      * @return string
      */
     public function resultString(): string {
-        return is_string($result = $this->getResult()) ? $result : throw new LogicException('Result not is string');
+        if (is_array($result = $this->getResult())) {
+            return (string)array_values($result)[$this->index++] ?? throw new PluginException('Result not found');
+        }
+
+        return is_string($result) ? $result : throw new LogicException('Result not is string');
     }
 
     /**
      * @return BanEntry|null
      */
     public function entryResult(): ?BanEntry {
-        return ($result = $this->getResult()) instanceof BanEntry ? $result : null;
+        if (is_array($result = $this->getResult())) {
+            return array_values($result)[$this->index++] ?? null;
+        }
+
+        return $result instanceof BanEntry ? $result : null;
     }
 
     /**

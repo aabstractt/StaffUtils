@@ -24,8 +24,6 @@ class PlayerPreLoginListener implements Listener {
             return;
         }
 
-        // TODO: Check if the xuid or ip is banned and if not banned process to SavePlayerStorageAsync
-
         TaskUtils::runAsync(new SavePlayerStorageAsync(
             $playerInfo->getUsername(),
             $playerInfo->getXuid(),

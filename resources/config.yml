@@ -27,6 +27,8 @@ require_ban_reason: false
 # When set to false, "DEFAULT_MUTE_REASON" in messages.yml are used as reasons when no reason is provided.
 require_mute_reason: false
 
+bypass_already_banned: true
+
 notify:
   # If enabled, players with the permission "staffutils.notify.banned_join" will be notified when a banned player tries to join
   banned_player_join: true

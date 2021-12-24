@@ -28,11 +28,6 @@ class UnbanCommand extends Command {
             return;
         }
 
-        /*$xuid = $sender->getName();
-        if ($sender instanceof Player) {
-            $xuid = $sender->getXuid();
-        }*/
-
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
             TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use ($name, $sender): void {
                 if (!is_array($result = $query->getResult()) || empty($result)) {
@@ -41,7 +36,7 @@ class UnbanCommand extends Command {
                     return;
                 }
 
-                $this->processUnban($sender, $result['xuid'], $result['lastAddress'], $name);
+                $this->processUnban($sender, $result['xuid'], $result['lastAddress'], $result['username']);
             });
 
             return;
