@@ -13,6 +13,8 @@ use pocketmine\utils\EnumTrait;
  * @method static StaffResult SUCCESS_MUTED()
  * @method static StaffResult UNBAN_FAIL()
  * @method static StaffResult SUCCESS_UNBANNED()
+ * @method static StaffResult UNMUTE_FAIL()
+ * @method static StaffResult SUCCESS_UNMUTED()
  */
 class StaffResult {
 
@@ -39,7 +41,9 @@ class StaffResult {
             new self('already_muted'),
             new self('success_muted'),
             new self('unban_fail'),
-            new self('success_unbanned')
+            new self('success_unbanned'),
+            new self('unmute_fail'),
+            new self('success_unmuted')
         );
     }
 }

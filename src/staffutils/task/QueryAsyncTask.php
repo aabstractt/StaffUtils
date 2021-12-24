@@ -48,13 +48,15 @@ abstract class QueryAsyncTask extends AsyncTask {
     }
 
     public function onCompletion(): void {
-        TaskUtils::submitAsync($this);
-
         if ($this->logException !== null) {
             Server::getInstance()->getLogger()->critical("Could not execute asynchronous task " . (new ReflectionClass($this))->getShortName() . ": Task crashed");
 
             Server::getInstance()->getLogger()->logException($this->logException);
+
+            return;
         }
+
+        TaskUtils::submitAsync($this);
     }
 
     /**
@@ -68,7 +70,7 @@ abstract class QueryAsyncTask extends AsyncTask {
 
     public function asInt(): int {
         if (is_array($result = $this->getResult())) {
-            return (int)array_values($result)[$this->index++] ?? throw new PluginException('Result not found');
+            return (int)(array_values($result)[$this->index++] ?? throw new PluginException('Result not found'));
         }
 
         return is_int($value = $this->getResult()) ? $value : throw new LogicException('Result not is integer');
@@ -79,7 +81,7 @@ abstract class QueryAsyncTask extends AsyncTask {
      */
     public function resultString(): string {
         if (is_array($result = $this->getResult())) {
-            return (string)array_values($result)[$this->index++] ?? throw new PluginException('Result not found');
+            return (string)(array_values($result)[$this->index++] ?? throw new PluginException('Result not found'));
         }
 
         return is_string($result) ? $result : throw new LogicException('Result not is string');

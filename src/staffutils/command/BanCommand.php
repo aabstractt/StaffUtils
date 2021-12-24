@@ -26,7 +26,7 @@ class BanCommand extends Command {
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
         if (($name = array_shift($args)) === null) {
-            $sender->sendMessage(TextFormat::RED . 'Use /ban <player> <time> <reason>');
+            $sender->sendMessage(TextFormat::RED . 'Use /' . $commandLabel . ' <player> <time> <reason>');
 
             return;
         }

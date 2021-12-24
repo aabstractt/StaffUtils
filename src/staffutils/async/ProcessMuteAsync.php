@@ -9,15 +9,15 @@ use staffutils\BanEntry;
 use staffutils\utils\MySQL;
 use staffutils\utils\TaskUtils;
 
-class ProcessBanAsync extends LoadBanActiveAsync {
+class ProcessMuteAsync extends LoadMuteActiveAsync {
 
     /**
      * @param BanEntry|null $entry
-     * @param bool          $bypass_already_banned
+     * @param bool          $bypass_already_muted
      */
     public function __construct(
         private ?BanEntry $entry,
-        private bool $bypass_already_banned
+        private bool $bypass_already_muted
     ) {
         if (($entry = $this->entry) === null) {
             throw new LogicException('BanEntry is null');
@@ -40,8 +40,8 @@ class ProcessBanAsync extends LoadBanActiveAsync {
 
         /** @var $result BanEntry */
         if (($result = $this->getResult()) instanceof BanEntry) {
-            if (!$result->expired() && !$this->bypass_already_banned) {
-                $this->setResult(['ALREADY_BANNED', $result]);
+            if (!$result->expired() && !$this->bypass_already_muted) {
+                $this->setResult(['ALREADY_MUTED', $result]);
 
                 return;
             }
@@ -49,17 +49,17 @@ class ProcessBanAsync extends LoadBanActiveAsync {
             $this->entry = $result;
         }
 
-        $mysqli->prepareStatement("INSERT INTO staffutils_ban (xuid, who, address, isIp, reason, createdAt, endAt) VALUES ('?', '?', '?', '?', '?', '?', '?')");
+        $this->setResult('SUCCESS_MUTED');
+
+        $mysqli->prepareStatement("INSERT INTO staffutils_mute (xuid, who, address, isIp, reason, createdAt, endAt) VALUES ('?', '?', '?', '?', '?', '?', '?')");
         $mysqli->set($entry->getXuid(), $entry->getWho(), $entry->getAddress(), $entry->isIp(), $entry->getReason(), $entry->getCreatedAt(), $entry->getEndAt());
 
         $mysqli->executeStatement()->close();
-
-        $this->setResult('SUCCESS_BANNED');
     }
 
     public function onCompletion(): void {
         if (($entry = $this->entry) !== null) {
-            TaskUtils::runAsync(new ProcessUnbanExpiredAsync($entry->getRowId()));
+            TaskUtils::runAsync(new ProcessUnmuteExpiredAsync($entry->getRowId()));
         }
 
         parent::onCompletion();

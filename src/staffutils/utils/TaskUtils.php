@@ -24,8 +24,7 @@ class TaskUtils {
 
     /**
      * @var callable[]
-     * @template T of QueryAsyncTask
-     * @phpstan-var array<string, callable<T>>
+     * @phpstan-var array<string, callable<QueryAsyncTask>>
      */
     private static array $callbacks = [];
 

@@ -10,7 +10,7 @@ use staffutils\BanEntry;
 use staffutils\task\QueryAsyncTask;
 use staffutils\utils\MySQL;
 
-class LoadBanActiveAsync extends QueryAsyncTask {
+class LoadMuteActiveAsync extends QueryAsyncTask {
 
     /**
      * @param string $xuid
@@ -32,8 +32,15 @@ class LoadBanActiveAsync extends QueryAsyncTask {
         $this->setResult($entry);
     }
 
+    /**
+     * @param MySQL  $mysqli
+     * @param string $value
+     * @param bool   $isXuid
+     *
+     * @return BanEntry|null
+     */
     private function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
-        $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
+        $mysqli->prepareStatement("SELECT * FROM staffutils_mute WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
         $mysqli->set($value);
 
         $stmt = $mysqli->executeStatement();
