@@ -77,9 +77,13 @@ class AltsCommand extends Command {
             }
 
             if ($nameEquals) {
+                if (!StaffUtils::getInstance()->getConfig()->getNested('notify.dupeip_on_join', true)) {
+                    return;
+                }
+
                 $maxBans = StaffUtils::getInstance()->getConfig()->getNested('notify.dupeip_on_join_threshold', 0);
 
-                if ($maxBans > 0 && $maxBans > count($query->banned)) {
+                if ($maxBans > 0 && $maxBans > count($result[1])) {
                     return;
                 }
             }
