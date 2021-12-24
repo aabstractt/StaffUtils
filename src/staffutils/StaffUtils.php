@@ -7,6 +7,7 @@ namespace staffutils;
 use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
+use pocketmine\plugin\PluginException;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
@@ -76,32 +77,6 @@ class StaffUtils extends PluginBase {
     }
 
     /**
-     * @param int $endAt
-     * @param int $actualAt
-     *
-     * @return string
-     */
-    public static function calculateRemain(int $endAt, int $actualAt): string {
-        $diff = $endAt - $actualAt;
-
-        if ($diff >= 60*60*24) {
-            return ($diff / 86400) . ' days, ' . ($diff % 86400) / 3600 . ' hours, ' . (($diff % 86400) % 3600) / 60 . ' minutes';
-        }
-
-        if ($diff >= 3600) {
-            $hours = $diff / 3600;
-
-            return ($diff / 3600) . ' hours, ' . (($diff - ($hours * 3600)) / 60) . ' minutes';
-        }
-
-        if ($diff >= 60) {
-            return $diff / 60 . ' minutes';
-        }
-
-        return $diff . ' seconds';
-    }
-
-    /**
      * @param string $timeArgument
      *
      * @return int|null
@@ -147,7 +122,7 @@ class StaffUtils extends PluginBase {
      * @return string
      */
     public static function dateNow(int $timestamp = -1): string {
-        return date('d/m/Y H:i:s', ($timestamp === -1 ? time() : $timestamp));
+        return date('Y-m-d H:i:s', ($timestamp === -1 ? time() : $timestamp));
     }
 
     /**
@@ -167,21 +142,39 @@ class StaffUtils extends PluginBase {
     }
 
     /**
-     * @param string $text
-     * @param bool   $value
-     * @param string ...$args
+     * @return string
+     */
+    public static function daysAsString(): string {
+        return is_string($value = self::getInstance()->getConfig()->getNested('durations.days', 'days')) ? $value : throw new PluginException('Invalid day value');
+    }
+    /**
+     * @return string
+     */
+    public static function hoursAsString(): string {
+        return is_string($value = self::getInstance()->getConfig()->getNested('durations.hours', 'hour')) ? $value : throw new PluginException('Invalid hour value');
+    }
+
+    /**
+     * @return string
+     */
+    public static function minutesAsString(): string {
+        return is_string($value = self::getInstance()->getConfig()->getNested('durations.minutes', 'minute')) ? $value : throw new PluginException('Invalid minute value');
+    }
+
+    /**
+     * @return string
+     */
+    public static function secondsAsString(): string {
+        return is_string($value = self::getInstance()->getConfig()->getNested('durations.seconds', 'second')) ? $value : throw new PluginException('Invalid second value');
+    }
+
+    /**
+     * @param string $string
+     * @param int    $value
      *
      * @return string
      */
-    public static function replaceDisplay(string $text, bool $value, string... $args): string {
-        $text = self::replacePlaceholders($text, ...$args);
-
-        if (!str_contains($text, '<display=')) {
-            return $text;
-        }
-
-        $split = explode('<display=', $text);
-
-        return str_replace('<display=' . $split[1], $value ? $split[1] : '', $text);
+    public static function pluralize(string $string, int $value): string {
+        return $value . ' ' . $string . ($value > 1 ? 's' : '');
     }
 }

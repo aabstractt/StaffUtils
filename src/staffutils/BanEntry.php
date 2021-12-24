@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace staffutils;
 
+use DateTime;
+
 class BanEntry {
 
     /** @var int */
@@ -150,15 +152,25 @@ class BanEntry {
         return !$this->isPermanent() && StaffUtils::dateNow() > $this->endAt;
     }
 
+    /**
+     * @return string
+     */
     public function remainingDurationString(): string {
         if ($this->expired() || $this->isPermanent()) {
             return 'Unknown';
         }
 
-        if (!is_int($endAt = strtotime($this->endAt))) {
+        if (!($now = date_create(StaffUtils::dateNow())) instanceof DateTime || !($end = date_create($this->endAt)) instanceof DateTime) {
             return 'Unknown';
         }
 
-        return StaffUtils::calculateRemain($endAt, time());
+        $interval = date_diff($now, $end);
+
+        $timeString = '';
+        if (($days = $interval->days) > 0) $timeString .= StaffUtils::pluralize(StaffUtils::daysAsString(), $days) . ', ';
+        if (($hours = $interval->h) > 0) $timeString .= StaffUtils::pluralize(StaffUtils::hoursAsString(), $hours) . ', ';
+        if (($minutes = $interval->i) > 0) $timeString .= StaffUtils::pluralize(StaffUtils::minutesAsString(), $minutes) . ', ';
+
+        return $timeString . StaffUtils::pluralize(StaffUtils::secondsAsString(), $interval->s);
     }
 }

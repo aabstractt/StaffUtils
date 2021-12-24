@@ -69,7 +69,7 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             return null;
         }
 
-        if (($who = $fetch['who']) !== 'CONSOLE') {
+        if (($who = $row['who']) !== 'CONSOLE') {
             $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
             $mysqli->set($who);
 

@@ -2,15 +2,15 @@
 PLAYER_TEMPORARILY_BANNED: "{%0} was banned from the server for {%3} by {%1}, reason {%2}"
 PLAYER_TEMPORARILY_MUTED: "{%0} was muted from the server for {%1} by {%2}, reason {%3}"
 # {%0} name   {%1} who    {%2} reason
-PLAYER_PERMANENTLY_BANNED: "{%0} was banned from the server by {%1}<display=, reason {%2}"
-PLAYER_PERMANENTLY_MUTED: "{%0} was muted from the server by {%1}<display=, reason {%2}"
+PLAYER_PERMANENTLY_BANNED: "{%0} was banned from the server by {%1}, reason {%2}"
+PLAYER_PERMANENTLY_MUTED: "{%0} was muted from the server by {%1}, reason {%2}"
 PLAYER_KICKED: "{%0} was kicked from the server by {%1}, reason {%2}"
 # {%0} name   {%1} time
 PLAYER_TRIED_JOIN_BANNED: "&b{%0} tried to join, but is banned ({%1})"
 PLAYER_TRIED_SPEAK_MUTED: "{%0} tried to speak, but is muted ({%1})"
 # {%0} who   {%1} reason   {$2} time   {%3} time remaining
-PLAYER_KICK_BANNED: "You are banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2} ({%3})"
-PLAYER_KICK_PERMANENT_BANNED: "You are permanent banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2}"
+PLAYER_KICK_TEMPORARILY_BANNED: "You are banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2} ({%3})"
+PLAYER_KICK_PERMANENTLY_BANNED: "You are permanent banned from this server!\nBanned by: {%0}\nReason: {%1}\nBanned on: {%2}"
 
 PLAYER_TRIED_SPEAK: "You are currently muted by {%0}, reason: {%1}, your mute expires in {%2}"
 

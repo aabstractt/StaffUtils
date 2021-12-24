@@ -26,7 +26,7 @@ class PlayerJoinListener implements Listener {
 
         // TODO: Later to show the kick message
         TaskUtils::runLater(new ClosureTask(function () use($entry, $player): void {
-            $player->kick(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getWhoName(), $entry->getReason(), $entry->getCreatedAt(), $entry->remainingDurationString()));
+            $player->kick(StaffUtils::replacePlaceholders('PLAYER_KICK_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getWhoName(), $entry->getReason(), $entry->getCreatedAt(), $entry->remainingDurationString()));
         }), 5);
     }
 }

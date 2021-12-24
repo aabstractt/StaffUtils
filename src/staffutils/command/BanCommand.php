@@ -118,7 +118,7 @@ class BanCommand extends Command {
      * @param BanEntry $entry
      */
     private function kickBan(BanEntry $entry): void {
-        $message = StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getWhoName(), $entry->getReason(), $entry->getCreatedAt(), $entry->remainingDurationString());
+        $message = StaffUtils::replacePlaceholders('PLAYER_KICK_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getWhoName(), $entry->getReason(), $entry->getCreatedAt(), $entry->remainingDurationString());
 
         if ($entry->isIp()) {
             $filter = array_filter(Server::getInstance()->getOnlinePlayers(), function ($player) use ($entry) {

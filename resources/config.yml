@@ -14,11 +14,10 @@ durations:
   tempmute_max: "3d"
 
   # Time translated
-  seconds: "seconds"
-  minutes: "minutes"
-  hours: "hours"
-  days: "days"
-  years: "years"
+  seconds: "second"
+  minutes: "minute"
+  hours: "hour"
+  days: "day"
 
 # If set, a ban reason must be provided, otherwise players will get an error.
 # When set to false, "DEFAULT_BAN_REASON" in messages.yml are used as reasons when no reason is provided.
