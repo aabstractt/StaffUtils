@@ -19,12 +19,8 @@ class ProcessUnbanAsync extends LoadBanActiveAsync {
         if (!($entry = $this->getResult()) instanceof BanEntry) {
             $this->setResult('UNBAN_FAIL');
 
-            echo 'Unban failed' . PHP_EOL;
-
             return;
         }
-
-        echo 'Unban' . PHP_EOL;
 
         $this->setResult('SUCCESS_UNBANNED');
 

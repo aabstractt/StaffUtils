@@ -64,7 +64,7 @@ class SavePlayerStorageAsync extends LoadBanActiveAsync {
 
     public function onCompletion(): void {
         if (($result = $this->entryResult()) !== null && $result->expired()) {
-            TaskUtils::runAsync(new ProcessUnbanAsync($result->getXuid(), $result->getAddress()));
+            TaskUtils::runAsync(new ProcessUnbanExpiredAsync($result->getRowId()));
 
             $this->setResult(null);
         }

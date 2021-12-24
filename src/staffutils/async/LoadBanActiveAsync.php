@@ -91,6 +91,6 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             $who = $whoFetch['username'];
         }
 
-        return new BanEntry($this->xuid, $fetch['username'], $row['address'], $row['who'], $who, ($row['isIp'] === 1) ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE);
+        return new BanEntry($this->xuid, $fetch['username'], $row['address'], $row['who'], $who, ($row['isIp'] === 1) ?? false, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE, $row['rowId']);
     }
 }

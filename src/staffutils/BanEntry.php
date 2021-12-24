@@ -16,12 +16,13 @@ class BanEntry {
      * @param string $name
      * @param string $address
      * @param string $who
+     * @param string $whoName
      * @param bool   $ip
      * @param string $reason
      * @param string $createdAt
      * @param string $endAt
      * @param int    $type
-     * @param string $whoName
+     * @param int    $rowId
      */
     public function __construct(
         private string $xuid,
@@ -33,7 +34,8 @@ class BanEntry {
         private string $reason = '',
         private string $createdAt = '',
         private string $endAt = '',
-        private int $type = -1
+        private int $type = -1,
+        private int $rowId = -1
     ) {}
 
     /**
@@ -129,6 +131,13 @@ class BanEntry {
      */
     public function setType(int $type): void {
         $this->type = $type;
+    }
+
+    /**
+     * @return int
+     */
+    public function getRowId(): int {
+        return $this->rowId;
     }
 
     /**
