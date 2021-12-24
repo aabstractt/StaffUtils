@@ -6,6 +6,7 @@ namespace staffutils\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\lang\Translatable;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
@@ -17,11 +18,27 @@ use staffutils\utils\TaskUtils;
 class UnmuteCommand extends Command {
 
     /**
+     * @param string                   $name
+     * @param Translatable|string      $description
+     * @param Translatable|string|null $usageMessage
+     * @param array                    $aliases
+     */
+    public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []) {
+        parent::__construct($name, $description, $usageMessage, $aliases);
+
+        $this->setPermission('staffutils.command.unmute');
+    }
+
+    /**
      * @param CommandSender $sender
      * @param string        $commandLabel
      * @param array         $args
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
+        if (!$this->testPermission($sender)) {
+            return;
+        }
+
         if (($name = array_shift($args)) === null) {
             $sender->sendMessage(TextFormat::RED . 'Usage: /unmute <player>');
 

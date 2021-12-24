@@ -68,6 +68,9 @@ abstract class QueryAsyncTask extends AsyncTask {
         }
     }
 
+    /**
+     * @return int
+     */
     public function asInt(): int {
         if (is_array($result = $this->getResult())) {
             return (int)(array_values($result)[$this->index++] ?? throw new PluginException('Result not found'));

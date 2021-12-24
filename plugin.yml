@@ -25,3 +25,5 @@ permissions:
     default: op
   staffutils.command.checkban:
     default: op
+  staffutils.permission:
+    default: op

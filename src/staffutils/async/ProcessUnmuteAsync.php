@@ -16,7 +16,7 @@ class ProcessUnmuteAsync extends LoadMuteActiveAsync {
         parent::query($mysqli);
 
         /** @var $entry BanEntry */
-        if (!($entry = $this->getResult()) instanceof BanEntry) {
+        if (!($entry = $this->entryResult()) !== null) {
             $this->setResult('UNMUTE_FAIL');
 
             return;

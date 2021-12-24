@@ -15,8 +15,7 @@ class ProcessUnbanAsync extends LoadBanActiveAsync {
     public function query(MySQL $mysqli): void {
         parent::query($mysqli);
 
-        /** @var $entry BanEntry */
-        if (!($entry = $this->getResult()) instanceof BanEntry) {
+        if (($entry = $this->entryResult()) === null) {
             $this->setResult('UNBAN_FAIL');
 
             return;

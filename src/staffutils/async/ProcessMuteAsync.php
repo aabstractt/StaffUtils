@@ -38,8 +38,7 @@ class ProcessMuteAsync extends LoadMuteActiveAsync {
 
         parent::query($mysqli);
 
-        /** @var $result BanEntry */
-        if (($result = $this->getResult()) instanceof BanEntry) {
+        if (($result = $this->entryResult()) !== null) {
             if (!$result->expired() && !$this->bypass_already_muted) {
                 $this->setResult(['ALREADY_MUTED', $result]);
 

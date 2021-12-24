@@ -6,6 +6,7 @@ namespace staffutils\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\lang\Translatable;
 use pocketmine\player\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -19,12 +20,22 @@ use staffutils\utils\TaskUtils;
 
 class BanCommand extends Command {
 
+    public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []) {
+        parent::__construct($name, $description, $usageMessage, $aliases);
+
+        $this->setPermission('staffutils.command.ban');
+    }
+
     /**
      * @param CommandSender $sender
      * @param string        $commandLabel
      * @param array         $args
      */
     public function execute(CommandSender $sender, string $commandLabel, array $args): void {
+        if (!$this->testPermission($sender)) {
+            return;
+        }
+
         if (($name = array_shift($args)) === null) {
             $sender->sendMessage(TextFormat::RED . 'Use /' . $commandLabel . ' <player> <time> <reason>');
 

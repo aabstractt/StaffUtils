@@ -32,8 +32,8 @@ class LoadBanActiveAsync extends QueryAsyncTask {
         $this->setResult($entry);
     }
 
-    private function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
-        $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
+    protected function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
+        $mysqli->prepareStatement("SELECT * FROM staffutils_ban WHERE " . ($isXuid ? 'xuid' : "isIp = '1' AND address") . " = '?'");
         $mysqli->set($value);
 
         $stmt = $mysqli->executeStatement();
@@ -91,6 +91,6 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             $who = $whoFetch['username'];
         }
 
-        return new BanEntry($this->xuid, $fetch['username'], $row['address'], $row['who'], $who, $row['isIp'] === 1, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE, $row['rowId']);
+        return new BanEntry($row['xuid'], $fetch['username'], $row['address'], $row['who'], $who, $row['isIp'] === 1, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::BAN_TYPE, $row['rowId']);
     }
 }

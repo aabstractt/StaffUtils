@@ -11,10 +11,13 @@ use pocketmine\plugin\PluginException;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use staffutils\command\AltsCommand;
 use staffutils\command\BanCommand;
+use staffutils\command\KickCommand;
 use staffutils\command\MuteCommand;
 use staffutils\command\UnbanCommand;
 use staffutils\command\UnmuteCommand;
+use staffutils\listener\PlayerChatListener;
 use staffutils\listener\PlayerJoinListener;
 use staffutils\listener\PlayerPreLoginListener;
 use staffutils\listener\PlayerQuitListener;
@@ -42,15 +45,18 @@ class StaffUtils extends PluginBase {
         $this->registerListener(
             new PlayerPreLoginListener(),
             new PlayerJoinListener(),
-            new PlayerQuitListener()
+            new PlayerQuitListener(),
+            new PlayerChatListener()
         );
 
-        $this->unregisterCommand('ban');
+        $this->unregisterCommand('ban', 'kick');
         $this->registerCommand(
             new BanCommand('ban', 'Ban command', '', ['ipban']),
             new UnbanCommand('unban'),
             new MuteCommand('mute', 'Mute command', '', ['ipmute']),
-            new UnmuteCommand('unmute', 'Unmute command')
+            new UnmuteCommand('unmute', 'Unmute command'),
+            new AltsCommand('alts', 'See player alts', '', ['checkalts', 'dupeip']),
+            new KickCommand('kick', 'Kick a player')
         );
     }
 
