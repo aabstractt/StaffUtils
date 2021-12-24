@@ -62,13 +62,13 @@ class MuteCommand extends Command {
                     return;
                 }
 
-                $this->processMute($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['lastAddress'], $xuid, $sender->getName(), $commandLabel === 'ipban'));
+                $this->processMute($sender, $args, new BanEntry($result['xuid'], $result['username'], $result['lastAddress'], $xuid, $sender->getName(), $commandLabel === 'ipmute'));
             });
 
             return;
         }
 
-        $this->processMute($sender, $args, new BanEntry($target->getXuid(), $target->getName(), $target->getNetworkSession()->getIp(), $xuid, $sender->getName(), $commandLabel === 'ipban'));
+        $this->processMute($sender, $args, new BanEntry($target->getXuid(), $target->getName(), $target->getNetworkSession()->getIp(), $xuid, $sender->getName(), $commandLabel === 'ipmute'));
     }
 
     /**
@@ -98,10 +98,8 @@ class MuteCommand extends Command {
             $timeString = $maxString;
         }
 
-        $endAt = '';
-
         if ($time !== null) {
-            $endAt = StaffUtils::dateNow($time);
+            $entry->setEndAt(StaffUtils::dateNow($time));
         }
 
         if (empty($args) && StaffUtils::getInstance()->getConfig()->get('require_mute_reason', true)) {
@@ -113,7 +111,6 @@ class MuteCommand extends Command {
         $entry->setReason(empty($args) ? StaffUtils::replacePlaceholders('DEFAULT_MUTE_REASON') : implode(' ', $args));
 
         $entry->setCreatedAt();
-        $entry->setEndAt($endAt);
         $entry->setType(BanEntry::BAN_TYPE);
 
         TaskUtils::runAsync(new ProcessMuteAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_muted', true))), function (ProcessMuteAsync $query) use ($timeString, $sender, $entry): void {
@@ -122,8 +119,6 @@ class MuteCommand extends Command {
 
                 return;
             }
-
-            //$this->kickBan($entry);
 
             Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_MUTED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString) ?? ''));
         });

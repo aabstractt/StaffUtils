@@ -12,7 +12,6 @@ use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\ProcessBanAsync;
-use staffutils\async\ProcessUnbanExpiredAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
@@ -20,6 +19,12 @@ use staffutils\utils\TaskUtils;
 
 class BanCommand extends Command {
 
+    /**
+     * @param string                   $name
+     * @param Translatable|string      $description
+     * @param Translatable|string|null $usageMessage
+     * @param array                    $aliases
+     */
     public function __construct(string $name, Translatable|string $description = "", Translatable|string|null $usageMessage = null, array $aliases = []) {
         parent::__construct($name, $description, $usageMessage, $aliases);
 
@@ -95,10 +100,8 @@ class BanCommand extends Command {
             $timeString = $maxString;
         }
 
-        $endAt = '';
-
         if ($time !== null) {
-            $endAt = StaffUtils::dateNow($time);
+            $entry->setEndAt(StaffUtils::dateNow($time));
         }
 
         if (empty($args) && StaffUtils::getInstance()->getConfig()->get('require_ban_reason', true)) {
@@ -110,7 +113,6 @@ class BanCommand extends Command {
         $entry->setReason(empty($args) ? StaffUtils::replacePlaceholders('DEFAULT_BAN_REASON') : implode(' ', $args));
 
         $entry->setCreatedAt();
-        $entry->setEndAt($endAt);
         $entry->setType(BanEntry::BAN_TYPE);
 
         TaskUtils::runAsync(new ProcessBanAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_banned', true))), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
