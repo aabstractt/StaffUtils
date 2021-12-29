@@ -23,7 +23,11 @@ permissions:
     default: op
   staffutils.command.alts:
     default: op
-  staffutils.command.checkban:
+  staffutils.command.warn:
+    default: op
+  staffutils.command.freeze:
+    default: op
+  staffutils.command.vanish:
     default: op
   staffutils.permission:
     default: op

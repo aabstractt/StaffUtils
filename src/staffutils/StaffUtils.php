@@ -14,12 +14,16 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use staffutils\command\AltsCommand;
 use staffutils\command\BanCommand;
+use staffutils\command\FreezeCommand;
 use staffutils\command\KickCommand;
 use staffutils\command\MuteCommand;
 use staffutils\command\UnbanCommand;
 use staffutils\command\UnmuteCommand;
+use staffutils\command\VanishCommand;
+use staffutils\command\WarnCommand;
 use staffutils\listener\PlayerChatListener;
 use staffutils\listener\PlayerJoinListener;
+use staffutils\listener\PlayerMoveListener;
 use staffutils\listener\PlayerPreLoginListener;
 use staffutils\listener\PlayerQuitListener;
 use staffutils\task\DiscordWebhookAsync;
@@ -49,7 +53,8 @@ class StaffUtils extends PluginBase {
             new PlayerPreLoginListener(),
             new PlayerJoinListener(),
             new PlayerQuitListener(),
-            new PlayerChatListener()
+            new PlayerChatListener(),
+            new PlayerMoveListener()
         );
 
         $this->unregisterCommand('ban', 'kick');
@@ -59,7 +64,10 @@ class StaffUtils extends PluginBase {
             new MuteCommand('mute', 'Mute command', '', ['ipmute']),
             new UnmuteCommand('unmute', 'Unmute command'),
             new AltsCommand('alts', 'See player alts', '', ['checkalts', 'dupeip']),
-            new KickCommand('kick', 'Kick a player')
+            new KickCommand('kick', 'Kick a player'),
+            new WarnCommand('warn'),
+            new FreezeCommand('freeze'),
+            new VanishCommand('vanish')
         );
     }
 
@@ -98,7 +106,7 @@ class StaffUtils extends PluginBase {
     public static function sendDiscordMessage(string $message): void {
         $config = self::getInstance()->getConfig();
 
-        Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookAsync($config->getNested('discord.webhook'), serialize([
+        Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookAsync(strval($config->getNested('discord.webhook')), serialize([
             'username' => $config->getNested('discord.username'),
             'content' => $message
         ])));

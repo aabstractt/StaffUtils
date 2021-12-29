@@ -9,6 +9,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use staffutils\command\AltsCommand;
+use staffutils\command\VanishCommand;
 use staffutils\StaffUtils;
 use staffutils\utils\TaskUtils;
 
@@ -21,6 +22,12 @@ class PlayerJoinListener implements Listener {
      */
     public function onPlayerJoinEvent(PlayerJoinEvent $ev): void {
         $player = $ev->getPlayer();
+
+        foreach (Server::getInstance()->getOnlinePlayers() as $target) {
+            if (in_array($target->getName(), VanishCommand::$vanish, true)) {
+                $player->hidePlayer($target);
+            }
+        }
 
         AltsCommand::processAlts(null, $player->getName(), $player->getXuid(), $player->getNetworkSession()->getIp(), true);
 

@@ -4,6 +4,10 @@ mysql:
   password: ''
   dbname: 'staffutils'
 
+discord:
+  webhook: ''
+  username: 'Webhook'
+
 # This format is used on PLAYER_KICK_BANNED and PLAYER_KICK_PERMANENT_BANNED, file messages.yml
 createdAt_format: "d/m/Y H:i:s"
 

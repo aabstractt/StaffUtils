@@ -122,6 +122,8 @@ class BanCommand extends Command {
                 return;
             }
 
+            StaffUtils::sendDiscordMessage(StaffUtils::replacePlaceholders('DISCORD_MESSAGE', $sender->getName(), $entry->getName(), $entry->typeToString(), StaffUtils::timeRemaining($timeString) ?? '', $entry->getReason()));
+
             $this->kickBan($entry);
 
             Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_BANNED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString) ?? ''));
