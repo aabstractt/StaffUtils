@@ -47,3 +47,5 @@ SILENT: "&9[S] &r"
 STAFFCHAT_MESSAGE: "&8[Staff] &7{%1} &b{%0}&7: &f{%2}"
 REPORT_SUCCESSFULLY: "&aYour report for {%0} was sent to the staff!"
 NEW_REPORT_RECEIVED: "&9[Report] &b{%1}&a was reported by &b{%0}&a for &b{%3}&a, server &b{%2}"
+
+DISCORD_MESSAGE: "Staff Name: {%0}\nPlayer: {%1}\nExecuted: {%2}\nDuration: {%3}\nReason: {%4}"

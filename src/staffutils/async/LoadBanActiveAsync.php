@@ -47,7 +47,7 @@ class LoadBanActiveAsync extends QueryAsyncTask {
         $result->close();
         $stmt->close();
 
-        if (empty($row)) {
+        if ($row === null || count($row) === 0) {
             return null;
         }
 
@@ -65,7 +65,7 @@ class LoadBanActiveAsync extends QueryAsyncTask {
         $result->close();
         $stmt->close();
 
-        if (empty($fetch)) {
+        if ($fetch === null || count($fetch) === 0) {
             return null;
         }
 
@@ -84,7 +84,7 @@ class LoadBanActiveAsync extends QueryAsyncTask {
             $result->close();
             $stmt->close();
 
-            if (empty($whoFetch)) {
+            if ($whoFetch === null || count($whoFetch) === 0) {
                 return null;
             }
 

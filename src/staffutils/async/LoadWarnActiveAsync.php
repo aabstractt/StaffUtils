@@ -10,7 +10,7 @@ use staffutils\BanEntry;
 use staffutils\task\QueryAsyncTask;
 use staffutils\utils\MySQL;
 
-class LoadMuteActiveAsync extends QueryAsyncTask {
+class LoadWarnActiveAsync extends QueryAsyncTask {
 
     /**
      * @param string $xuid
@@ -25,23 +25,8 @@ class LoadMuteActiveAsync extends QueryAsyncTask {
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
-        if (($entry = $this->fetch($mysqli, $this->lastAddress, false)) === null) {
-            $entry = $this->fetch($mysqli, $this->xuid);
-        }
-
-        $this->setResult($entry);
-    }
-
-    /**
-     * @param MySQL  $mysqli
-     * @param string $value
-     * @param bool   $isXuid
-     *
-     * @return BanEntry|null
-     */
-    private function fetch(MySQL $mysqli, string $value, bool $isXuid = true): ?BanEntry {
-        $mysqli->prepareStatement("SELECT * FROM staffutils_mute WHERE " . ($isXuid ? 'xuid' : "isIp = 'true' AND address") . " = '?'");
-        $mysqli->set($value);
+        $mysqli->prepareStatement("SELECT * FROM staffutils_warn WHERE xuid = '?'");
+        $mysqli->set($this->xuid);
 
         $stmt = $mysqli->executeStatement();
 
@@ -55,7 +40,9 @@ class LoadMuteActiveAsync extends QueryAsyncTask {
         $stmt->close();
 
         if ($row === null || count($row) === 0) {
-            return null;
+            $this->setResult(null);
+
+            return;
         }
 
         $mysqli->prepareStatement("SELECT * FROM players_registered WHERE xuid = '?'");
@@ -73,7 +60,9 @@ class LoadMuteActiveAsync extends QueryAsyncTask {
         $stmt->close();
 
         if ($fetch === null || count($fetch) === 0) {
-            return null;
+            $this->setResult(null);
+
+            return;
         }
 
         if (($who = $row['who']) !== 'CONSOLE') {
@@ -92,12 +81,14 @@ class LoadMuteActiveAsync extends QueryAsyncTask {
             $stmt->close();
 
             if ($whoFetch === null || count($whoFetch) === 0) {
-                return null;
+                $this->setResult(null);
+
+                return;
             }
 
             $who = $whoFetch['username'];
         }
 
-        return new BanEntry($this->xuid, $fetch['username'], $row['address'], $row['who'], $who, $row['isIp'] === 1, $row['reason'], $row['createdAt'], $row['endAt'], BanEntry::MUTE_TYPE, $row['rowId']);
+        $this->setResult(new BanEntry($this->xuid, $fetch['username'], '', $row['who'], $who, false, $row['reason'], '', '', BanEntry::WARN_TYPE, $row['rowId']));
     }
 }

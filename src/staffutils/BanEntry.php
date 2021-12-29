@@ -10,6 +10,8 @@ class BanEntry {
 
     /** @var int */
     public const BAN_TYPE = 1;
+    public const MUTE_TYPE = 2;
+    public const WARN_TYPE = 3;
 
     /**
      * @param string $xuid
@@ -181,5 +183,17 @@ class BanEntry {
         if (($minutes = $interval->i) > 0) $timeString .= StaffUtils::pluralize(StaffUtils::minutesAsString(), $minutes) . ', ';
 
         return $timeString . StaffUtils::pluralize(StaffUtils::secondsAsString(), $interval->s);
+    }
+
+    /**
+     * @return string
+     */
+    public function typeToString(): string {
+        return match ($this->type) {
+            self::BAN_TYPE => 'Ban',
+            self::MUTE_TYPE => 'Mute',
+            self::WARN_TYPE => 'Warn',
+            default => 'Unknown'
+        };
     }
 }

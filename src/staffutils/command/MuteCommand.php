@@ -56,7 +56,7 @@ class MuteCommand extends Command {
             TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use($commandLabel, $name, $xuid, $sender, $args): void {
                 $result = $query->getResult();
 
-                if (!is_array($result) || empty($result)) {
+                if (!is_array($result) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -102,16 +102,20 @@ class MuteCommand extends Command {
             $entry->setEndAt(StaffUtils::dateNow($time));
         }
 
-        if (empty($args) && StaffUtils::getInstance()->getConfig()->get('require_mute_reason', true)) {
+        if (!is_bool($required = StaffUtils::getInstance()->getConfig()->get('require_mute_reason', true))) {
+            return;
+        }
+
+        if (count($args) === 0 && $required) {
             $sender->sendMessage(StaffUtils::replacePlaceholders('INVALID_REASON'));
 
             return;
         }
 
-        $entry->setReason(empty($args) ? StaffUtils::replacePlaceholders('DEFAULT_MUTE_REASON') : implode(' ', $args));
+        $entry->setReason(count($args) === 0 ? StaffUtils::replacePlaceholders('DEFAULT_MUTE_REASON') : implode(' ', $args));
 
         $entry->setCreatedAt();
-        $entry->setType(BanEntry::BAN_TYPE);
+        $entry->setType(BanEntry::MUTE_TYPE);
 
         TaskUtils::runAsync(new ProcessMuteAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_muted', true))), function (ProcessMuteAsync $query) use ($timeString, $sender, $entry): void {
             if ($query->asStaffResult() === StaffResult::ALREADY_MUTED()) {
@@ -119,6 +123,8 @@ class MuteCommand extends Command {
 
                 return;
             }
+
+            StaffUtils::sendDiscordMessage(StaffUtils::replacePlaceholders('DISCORD_MESSAGE', $sender->getName(), $entry->getName(), $entry->typeToString(), StaffUtils::timeRemaining($timeString) ?? '', $entry->getReason()));
 
             Server::getInstance()->broadcastMessage(StaffUtils::replacePlaceholders('PLAYER_' . ($entry->isPermanent() ? 'PERMANENTLY' : 'TEMPORARILY') . '_MUTED', $entry->getName(), $sender->getName(), $entry->getReason(), StaffUtils::timeRemaining($timeString) ?? ''));
         });

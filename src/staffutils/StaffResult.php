@@ -9,12 +9,16 @@ use pocketmine\utils\EnumTrait;
 /**
  * @method static StaffResult ALREADY_BANNED()
  * @method static StaffResult SUCCESS_BANNED()
- * @method static StaffResult ALREADY_MUTED()
- * @method static StaffResult SUCCESS_MUTED()
  * @method static StaffResult UNBAN_FAIL()
  * @method static StaffResult SUCCESS_UNBANNED()
+ *
+ * @method static StaffResult ALREADY_MUTED()
+ * @method static StaffResult SUCCESS_MUTED()
  * @method static StaffResult UNMUTE_FAIL()
  * @method static StaffResult SUCCESS_UNMUTED()
+ *
+ * @method static StaffResult ALREADY_WARNED()
+ * @method static StaffResult SUCCESS_WARNED()
  */
 class StaffResult {
 

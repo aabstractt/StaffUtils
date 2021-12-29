@@ -8,6 +8,7 @@ use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
 use pocketmine\plugin\PluginException;
+use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
@@ -21,6 +22,7 @@ use staffutils\listener\PlayerChatListener;
 use staffutils\listener\PlayerJoinListener;
 use staffutils\listener\PlayerPreLoginListener;
 use staffutils\listener\PlayerQuitListener;
+use staffutils\task\DiscordWebhookAsync;
 use staffutils\utils\TaskUtils;
 
 class StaffUtils extends PluginBase {
@@ -37,6 +39,7 @@ class StaffUtils extends PluginBase {
 
         $this->saveDefaultConfig();
         $this->saveResource('messages.yml');
+        $this->saveResource('queries.sql');
 
         self::$messages = (new Config($this->getDataFolder() . 'messages.yml'))->getAll();
 
@@ -87,6 +90,18 @@ class StaffUtils extends PluginBase {
 
             $this->getServer()->getCommandMap()->unregister($cmd);
         }
+    }
+
+    /**
+     * @param string $message
+     */
+    public static function sendDiscordMessage(string $message): void {
+        $config = self::getInstance()->getConfig();
+
+        Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookAsync($config->getNested('discord.webhook'), serialize([
+            'username' => $config->getNested('discord.username'),
+            'content' => $message
+        ])));
     }
 
     /**

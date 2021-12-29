@@ -3,3 +3,5 @@ CREATE TABLE IF NOT EXISTS players_registered (rowId INT PRIMARY KEY AUTO_INCREM
 CREATE TABLE IF NOT EXISTS staffutils_ban (rowId INT PRIMARY KEY AUTO_INCREMENT, xuid TEXT, who TEXT, address TEXT, isIp BOOLEAN, reason TEXT, createdAt VARCHAR(60), endAt VARCHAR(60));
 
 CREATE TABLE IF NOT EXISTS staffutils_mute (rowId INT PRIMARY KEY AUTO_INCREMENT, xuid TEXT, who TEXT, address TEXT, isIp BOOLEAN, reason TEXT, createdAt VARCHAR(60), endAt VARCHAR(60));
+
+CREATE TABLE IF NOT EXISTS staffutils_warn (rowId INT PRIMARY KEY AUTO_INCREMENT, xuid TEXT, who TEXT, reason TEXT);
