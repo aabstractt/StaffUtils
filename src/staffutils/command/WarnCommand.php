@@ -15,6 +15,7 @@ use staffutils\async\ProcessWarnAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class WarnCommand extends Command {
@@ -47,16 +48,11 @@ class WarnCommand extends Command {
             return;
         }
 
-        $xuid = $sender->getName();
-        if ($sender instanceof Player) {
-            $xuid = $sender->getXuid();
-        }
+        $xuid = $sender instanceof Player ? $sender->getXuid() : $sender->getName();
 
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use($name, $xuid, $sender, $args): void {
-                $result = $query->getResult();
-
-                if (!is_array($result) || count($result) === 0) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (QueryAsyncTask $query) use($name, $xuid, $sender, $args): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -88,7 +84,7 @@ class WarnCommand extends Command {
         $entry->setCreatedAt();
         $entry->setType(BanEntry::WARN_TYPE);
 
-        TaskUtils::runAsync(new ProcessWarnAsync($entry), function (ProcessWarnAsync $query) use ($sender, $entry): void {
+        TaskUtils::runAsync(new ProcessWarnAsync($entry), function (QueryAsyncTask $query) use ($sender, $entry): void {
             if ($query->asStaffResult() === StaffResult::ALREADY_WARNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_WARNED', $entry->getName()));
 

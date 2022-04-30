@@ -13,6 +13,7 @@ use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\ProcessUnbanAsync;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class UnbanCommand extends Command {
@@ -46,8 +47,8 @@ class UnbanCommand extends Command {
         }
 
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use ($name, $sender): void {
-                if (!is_array($result = $query->getResult()) || empty($result)) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (QueryAsyncTask $query) use ($name, $sender): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -63,7 +64,7 @@ class UnbanCommand extends Command {
     }
 
     private function processUnban(CommandSender $sender, string $xuid, string $lastAddress, string $name): void {
-        TaskUtils::runAsync(new ProcessUnbanAsync($xuid, $lastAddress), function (ProcessUnbanAsync $query) use ($sender, $name): void {
+        TaskUtils::runAsync(new ProcessUnbanAsync($xuid, $lastAddress), function (QueryAsyncTask $query) use ($sender, $name): void {
             if ($query->asStaffResult() === StaffResult::UNBAN_FAIL()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_UNBAN_FAIL', $name));
 

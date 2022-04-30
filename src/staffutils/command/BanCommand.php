@@ -15,6 +15,7 @@ use staffutils\async\ProcessBanAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class BanCommand extends Command {
@@ -47,18 +48,11 @@ class BanCommand extends Command {
             return;
         }
 
-        $xuid = $sender->getName();
-        if ($sender instanceof Player) {
-            $xuid = $sender->getXuid();
-        }
+        $xuid = $sender instanceof Player ? $sender->getXuid() : $sender->getName();
 
-        $target = Server::getInstance()->getPlayerByPrefix($name);
-
-        if ($target === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use($commandLabel, $name, $xuid, $sender, $args): void {
-                $result = $query->getResult();
-
-                if (!is_array($result) || empty($result)) {
+        if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (QueryAsyncTask $query) use($commandLabel, $name, $xuid, $sender, $args): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -104,18 +98,18 @@ class BanCommand extends Command {
             $entry->setEndAt(StaffUtils::dateNow($time));
         }
 
-        if (empty($args) && StaffUtils::getInstance()->getConfig()->get('require_ban_reason', true)) {
+        if (count($args) === 0 && StaffUtils::getInstance()->getBoolean('require_ban_reason', true)) {
             $sender->sendMessage(StaffUtils::replacePlaceholders('INVALID_REASON'));
 
             return;
         }
 
-        $entry->setReason(empty($args) ? StaffUtils::replacePlaceholders('DEFAULT_BAN_REASON') : implode(' ', $args));
+        $entry->setReason(count($args) === 0 ? StaffUtils::replacePlaceholders('DEFAULT_BAN_REASON') : implode(' ', $args));
 
         $entry->setCreatedAt();
         $entry->setType(BanEntry::BAN_TYPE);
 
-        TaskUtils::runAsync(new ProcessBanAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_banned', true))), function (ProcessBanAsync $query) use ($timeString, $sender, $entry): void {
+        TaskUtils::runAsync(new ProcessBanAsync($entry, StaffUtils::getInstance()->getBoolean('bypass_already_banned', true)), function (QueryAsyncTask $query) use ($timeString, $sender, $entry): void {
             if ($query->asStaffResult() === StaffResult::ALREADY_BANNED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_BANNED', $entry->getName()));
 

@@ -15,6 +15,7 @@ use staffutils\async\ProcessMuteAsync;
 use staffutils\BanEntry;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class MuteCommand extends Command {
@@ -47,16 +48,11 @@ class MuteCommand extends Command {
             return;
         }
 
-        $xuid = $sender->getName();
-        if ($sender instanceof Player) {
-            $xuid = $sender->getXuid();
-        }
+        $xuid = $sender instanceof Player ? $sender->getXuid() : $sender->getName();
 
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use($commandLabel, $name, $xuid, $sender, $args): void {
-                $result = $query->getResult();
-
-                if (!is_array($result) || count($result) === 0) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (QueryAsyncTask $query) use($commandLabel, $name, $xuid, $sender, $args): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -102,11 +98,7 @@ class MuteCommand extends Command {
             $entry->setEndAt(StaffUtils::dateNow($time));
         }
 
-        if (!is_bool($required = StaffUtils::getInstance()->getConfig()->get('require_mute_reason', true))) {
-            return;
-        }
-
-        if (count($args) === 0 && $required) {
+        if (count($args) === 0 && StaffUtils::getInstance()->getBoolean('require_mute_reason', true)) {
             $sender->sendMessage(StaffUtils::replacePlaceholders('INVALID_REASON'));
 
             return;
@@ -117,7 +109,7 @@ class MuteCommand extends Command {
         $entry->setCreatedAt();
         $entry->setType(BanEntry::MUTE_TYPE);
 
-        TaskUtils::runAsync(new ProcessMuteAsync($entry, boolval(StaffUtils::getInstance()->getConfig()->get('bypass_already_muted', true))), function (ProcessMuteAsync $query) use ($timeString, $sender, $entry): void {
+        TaskUtils::runAsync(new ProcessMuteAsync($entry, StaffUtils::getInstance()->getBoolean('bypass_already_muted', true)), function (QueryAsyncTask $query) use ($timeString, $sender, $entry): void {
             if ($query->asStaffResult() === StaffResult::ALREADY_MUTED()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_ALREADY_MUTED', $entry->getName()));
 

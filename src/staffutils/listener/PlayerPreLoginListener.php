@@ -9,6 +9,7 @@ use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\player\XboxLivePlayerInfo;
 use staffutils\async\SavePlayerStorageAsync;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class PlayerPreLoginListener implements Listener {
@@ -28,7 +29,7 @@ class PlayerPreLoginListener implements Listener {
             $playerInfo->getUsername(),
             $playerInfo->getXuid(),
             $ev->getIp()
-        ), function (SavePlayerStorageAsync $query) use ($playerInfo): void {
+        ), function (QueryAsyncTask $query) use ($playerInfo): void {
             if (($result = $query->entryResult()) === null) {
                 return;
             }

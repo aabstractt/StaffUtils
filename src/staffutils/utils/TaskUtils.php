@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace staffutils\utils;
 
+use Closure;
 use pocketmine\scheduler\Task;
 use pocketmine\Server;
 use staffutils\StaffUtils;
@@ -23,8 +24,7 @@ class TaskUtils {
     protected static int $port;
 
     /**
-     * @var callable[]
-     * @phpstan-var array<string, callable<QueryAsyncTask>>
+     * @phpstan-var array<string, Closure(QueryAsyncTask): void>
      */
     private static array $callbacks = [];
 
@@ -47,12 +47,11 @@ class TaskUtils {
 
     /**
      * @param QueryAsyncTask $query
-     * @param callable|null  $callback
+     * @param null|Closure  $callback
      *
-     * @template T of QueryAsyncTask
-     * @phpstan-param callable(T) : void $callback
+     * @phpstan-param Closure(QueryAsyncTask):void|null $callback
      */
-    public static function runAsync(QueryAsyncTask $query, ?callable $callback = null): void {
+    public static function runAsync(QueryAsyncTask $query, Closure $callback = null): void {
         if ($callback !== null) {
             self::$callbacks[spl_object_hash($query)] = $callback;
         }

@@ -13,6 +13,7 @@ use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\async\ProcessUnmuteAsync;
 use staffutils\StaffResult;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class UnmuteCommand extends Command {
@@ -46,8 +47,8 @@ class UnmuteCommand extends Command {
         }
 
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (LoadPlayerStorageAsync $query) use ($name, $sender): void {
-                if (!is_array($result = $query->getResult()) || empty($result)) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function (QueryAsyncTask $query) use ($name, $sender): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -63,7 +64,7 @@ class UnmuteCommand extends Command {
     }
 
     private function processUnmute(CommandSender $sender, string $xuid, string $lastAddress, string $name): void {
-        TaskUtils::runAsync(new ProcessUnmuteAsync($xuid, $lastAddress), function (ProcessUnmuteAsync $query) use ($sender, $name): void {
+        TaskUtils::runAsync(new ProcessUnmuteAsync($xuid, $lastAddress), function (QueryAsyncTask $query) use ($sender, $name): void {
             if ($query->asStaffResult() === StaffResult::UNMUTE_FAIL()) {
                 $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_UNMUTE_FAIL', $name));
 

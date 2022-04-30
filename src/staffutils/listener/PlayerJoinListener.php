@@ -6,6 +6,7 @@ namespace staffutils\listener;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\player\Player;
 use pocketmine\scheduler\ClosureTask;
 use pocketmine\Server;
 use staffutils\command\AltsCommand;
@@ -35,14 +36,13 @@ class PlayerJoinListener implements Listener {
             return;
         }
 
-        if (StaffUtils::getInstance()->getConfig()->getNested('notify.banned_player_join', true)) {
-            $filter = array_filter(Server::getInstance()->getOnlinePlayers(), function ($player) {
-                return $player->hasPermission('staffutils.permission');
-            });
-
+        if (StaffUtils::getInstance()->getBoolean('notify.banned_player_join', true)) {
             Server::getInstance()->getLogger()->info($message = StaffUtils::replacePlaceholders('PLAYER_TRIED_JOIN_BANNED', $entry->getName(), $entry->remainingDurationString()));
 
-            foreach ($filter as $target) {
+            foreach (array_filter(
+                Server::getInstance()->getOnlinePlayers(),
+                fn(Player $player) => $player->hasPermission('staffutils.permission')
+                     ) as $target) {
                 $target->sendMessage($message);
             }
         }

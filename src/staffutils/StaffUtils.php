@@ -106,6 +106,10 @@ class StaffUtils extends PluginBase {
     public static function sendDiscordMessage(string $message): void {
         $config = self::getInstance()->getConfig();
 
+        if (!self::getInstance()->getBoolean('discord.enabled')) {
+            return;
+        }
+
         Server::getInstance()->getAsyncPool()->submitTask(new DiscordWebhookAsync(strval($config->getNested('discord.webhook')), serialize([
             'username' => $config->getNested('discord.username'),
             'content' => $message
@@ -202,6 +206,16 @@ class StaffUtils extends PluginBase {
      */
     public static function secondsAsString(): string {
         return is_string($value = self::getInstance()->getConfig()->getNested('durations.seconds', 'second')) ? $value : throw new PluginException('Invalid second value');
+    }
+
+    /**
+     * @param string $k
+     * @param bool   $default
+     *
+     * @return bool
+     */
+    public function getBoolean(string $k, bool $default = false): bool {
+        return is_bool($value = $this->getConfig()->getNested($k, $default)) ? $value : $default;
     }
 
     /**

@@ -12,6 +12,7 @@ use pocketmine\utils\TextFormat;
 use staffutils\async\LoadAddressStorageAsync;
 use staffutils\async\LoadPlayerStorageAsync;
 use staffutils\StaffUtils;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class AltsCommand extends Command {
@@ -45,8 +46,8 @@ class AltsCommand extends Command {
         }
 
         if (($target = Server::getInstance()->getPlayerByPrefix($name)) === null) {
-            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function(LoadPlayerStorageAsync $query) use ($sender, $name): void {
-                if (!is_array($result = $query->getResult()) || empty($result)) {
+            TaskUtils::runAsync(new LoadPlayerStorageAsync($name, false), function(QueryAsyncTask $query) use ($sender, $name): void {
+                if (!is_array($result = $query->getResult()) || count($result) === 0) {
                     $sender->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                     return;
@@ -69,15 +70,15 @@ class AltsCommand extends Command {
      * @param bool               $nameEquals
      */
     public static function processAlts(?CommandSender $sender, string $name, string $xuid, string $lastAddress, bool $nameEquals = false): void {
-        TaskUtils::runAsync(new LoadAddressStorageAsync($xuid, $lastAddress), function (LoadAddressStorageAsync $query) use ($nameEquals, $sender, $name): void {
-            if (!is_array($result = $query->getResult()) || empty($result)) {
+        TaskUtils::runAsync(new LoadAddressStorageAsync($xuid, $lastAddress), function (QueryAsyncTask $query) use ($nameEquals, $sender, $name): void {
+            if (!is_array($result = $query->getResult()) || count($result) === 0) {
                 $sender?->sendMessage(StaffUtils::replacePlaceholders('PLAYER_NOT_FOUND', $name));
 
                 return;
             }
 
             if ($nameEquals) {
-                if (!StaffUtils::getInstance()->getConfig()->getNested('notify.dupeip_on_join', true)) {
+                if (!StaffUtils::getInstance()->getBoolean('notify.dupeip_on_join', true)) {
                     return;
                 }
 
@@ -92,7 +93,7 @@ class AltsCommand extends Command {
             foreach ($result[0] as $scanner) {
                 $key = 'SCANNING_OFFLINE';
 
-                if (in_array($scanner, $result[1])) {
+                if (in_array($scanner, $result[1], true)) {
                     $key = 'SCANNING_BANNED';
                 } else if (Server::getInstance()->getPlayerExact($scanner) !== null) {
                     $key = 'SCANNING_ONLINE';
