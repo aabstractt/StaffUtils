@@ -31,3 +31,8 @@ permissions:
     default: op
   staffutils.permission:
     default: op
+
+  staffutils.command.invsee:
+    default: op
+  staffutils.command.ecsee:
+    default: op

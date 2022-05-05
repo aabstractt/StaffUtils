@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace staffutils;
 
+use muqsit\invmenu\InvMenuHandler;
 use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\plugin\PluginBase;
@@ -14,7 +15,9 @@ use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
 use staffutils\command\AltsCommand;
 use staffutils\command\BanCommand;
+use staffutils\command\EnderChestSeeCommand;
 use staffutils\command\FreezeCommand;
+use staffutils\command\InvSeeCommand;
 use staffutils\command\KickCommand;
 use staffutils\command\MuteCommand;
 use staffutils\command\UnbanCommand;
@@ -38,8 +41,26 @@ class StaffUtils extends PluginBase {
     /** @var array */
     private static array $messages = [];
 
+    public const ARMOR_TO_MENU_SLOTS = [
+        0 => 47,
+        1 => 48,
+        2 => 50,
+        3 => 51
+    ];
+
+    public const MENU_TO_ARMOR_SLOTS = [
+        47 => 0,
+        48 => 1,
+        50 => 2,
+        51 => 3
+    ];
+
     public function onEnable(): void {
         self::setInstance($this);
+
+        if (!InvMenuHandler::isRegistered()) {
+            InvMenuHandler::register($this);
+        }
 
         $this->saveDefaultConfig();
         $this->saveResource('messages.yml');
@@ -67,7 +88,9 @@ class StaffUtils extends PluginBase {
             new KickCommand('kick', 'Kick a player'),
             new WarnCommand('warn'),
             new FreezeCommand('freeze'),
-            new VanishCommand('vanish')
+            new VanishCommand('vanish'),
+            new InvSeeCommand('invsee'),
+            new EnderChestSeeCommand('ecsee')
         );
     }
 

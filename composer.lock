@@ -4,9 +4,54 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fd5720a6b046c01b5675b384e282d1d3",
+    "content-hash": "cb11df247779d840024b19e71fbd3f29",
     "packages": [],
     "packages-dev": [
+        {
+            "name": "abstract/invmenu",
+            "version": "4.0.x-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/wXav/InvMenu.git",
+                "reference": "23bde1943ec934b37a6977d345588f2bcde08211"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/wXav/InvMenu/zipball/23bde1943ec934b37a6977d345588f2bcde08211",
+                "reference": "23bde1943ec934b37a6977d345588f2bcde08211",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "ext-mysqli": "*",
+                "ext-pthreads": "*",
+                "ext-yaml": "*",
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.2.0",
+                "phpstan/phpstan-strict-rules": "^1.1.0",
+                "pocketmine/pocketmine-mp": "^4.0.3"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": [
+                        "src"
+                    ]
+                }
+            },
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "InvMenu PocketMine Library",
+            "support": {
+                "source": "https://github.com/wXav/InvMenu/tree/4.0"
+            },
+            "time": "2022-04-30T02:59:30+00:00"
+        },
         {
             "name": "adhocore/json-comment",
             "version": "1.1.2",
@@ -1424,7 +1469,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "abstract/invmenu": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
