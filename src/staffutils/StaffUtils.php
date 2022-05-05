@@ -12,6 +12,7 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\SingletonTrait;
 use pocketmine\utils\TextFormat;
+use staffutils\async\LoadMysqlAsync;
 use staffutils\command\AltsCommand;
 use staffutils\command\BanCommand;
 use staffutils\command\FreezeCommand;
@@ -27,6 +28,7 @@ use staffutils\listener\PlayerMoveListener;
 use staffutils\listener\PlayerPreLoginListener;
 use staffutils\listener\PlayerQuitListener;
 use staffutils\task\DiscordWebhookAsync;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\TaskUtils;
 
 class StaffUtils extends PluginBase {
@@ -48,6 +50,9 @@ class StaffUtils extends PluginBase {
         self::$messages = (new Config($this->getDataFolder() . 'messages.yml'))->getAll();
 
         TaskUtils::init();
+        TaskUtils::runAsync(new LoadMysqlAsync(), function (QueryAsyncTask $query): void {
+            $this->getLogger()->info('mysql successfully loaded!');
+        });
 
         $this->registerListener(
             new PlayerPreLoginListener(),
