@@ -5,32 +5,27 @@ declare(strict_types=1);
 namespace staffutils\async;
 
 use staffutils\BanEntry;
+use staffutils\task\QueryAsyncTask;
 use staffutils\utils\MySQL;
 
-class ProcessWarnAsync extends LoadWarnActiveAsync {
+class ProcessWarnAsync extends QueryAsyncTask {
 
     /**
      * @param BanEntry $entry
      */
-    public function __construct(
-        private BanEntry $entry
-    ) {
-        parent::__construct($entry->getXuid(), $entry->getAddress());
+    public function __construct(BanEntry $entry) {
+        $this->storeLocal('BAN_ENTRY', $entry);
     }
 
     /**
      * @param MySQL $mysqli
      */
     public function query(MySQL $mysqli): void {
-        parent::query($mysqli);
-
-        if (($result = $this->entryResult()) !== null && !$result->expired()) {
-            $this->setResult(['ALREADY_WARNED', $result]);
+        if (!($entry = $this->fetchLocal('BAN_ENTRY')) instanceof BanEntry) {
+            $this->setResult('ALREADY_WARNED');
 
             return;
         }
-
-        $entry = $this->entry;
 
         $this->setResult('SUCCESS_WARNED');
 
