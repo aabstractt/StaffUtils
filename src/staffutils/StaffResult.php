@@ -47,7 +47,9 @@ class StaffResult {
             new self('unban_fail'),
             new self('success_unbanned'),
             new self('unmute_fail'),
-            new self('success_unmuted')
+            new self('success_unmuted'),
+            new self('already_warned'),
+            new self('success_warned')
         );
     }
 }
